@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from DeviceCommand import DeviceCommand, CommandConst
+from devicecommand import DeviceCommand, CommandConst
 
 
 class ConnectionCheck(DeviceCommand):

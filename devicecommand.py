@@ -65,8 +65,8 @@ class DeviceCommand():
         return CommandConst.unknown
 
     def numAnswerBytes(self):
-        number = self.START_COMMAND_CRC_SIZE + self.DATA_BYTE_SIZE \
-            + self.numAnswerDataBytes
+        number = self.START_COMMAND_CRC_SIZE + \
+            self.DATA_BYTE_SIZE * self.numAnswerDataBytes
         return number
 
     @abstractmethod
