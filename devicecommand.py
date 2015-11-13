@@ -1,19 +1,19 @@
 #!/usr/bin/python
-# -*- conding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 from abc import ABCMeta, abstractmethod, abstractproperty
 
 
 class CommandConst:
-    """ Коды всех команд """
+    """"""
     connectionCheck = 0x00
     changeSpeed = 0x01
 
-    setSimpleLEDs = 0x10
-    setSmartLEDs = 0x11
-    setSmartOctetLEDs = 0x14
-    setSmartQuartetLEDs = 0x15
-    setSmartOneLEDs = 0x16
+    setSimpleLeds = 0x10
+    setSmartLeds = 0x11
+    setSmartOctetLeds = 0x14
+    setSmartQuartetLeds = 0x15
+    setSmartOneLeds = 0x16
     setLCD = 0x12
     setRelays = 0x13
 
@@ -24,6 +24,16 @@ class CommandConst:
     getStuckButtons = 0x24
     getAllState = 0x2F
     unknown = 0x56
+
+    def commandTypeIsSet(self, commandCode):
+        if (commandCode >> 4) & 0x0f <= 1:
+            return True
+        return False
+
+    def commandTypeIsGet(self, commandCode):
+        if (commandCode >> 4) & 0x0f == 2:
+            return True
+        return False
 
 
 class DeviceCommand():
@@ -36,6 +46,14 @@ class DeviceCommand():
     # Одни байт данных в пакете занимает 2 (старший и младший)
     DATA_BYTE_SIZE = 2
 
+    def __init__(self, port, address, slave):
+        self.__portDescriptor = port
+        self.__address = address
+        # self.__data = None
+        # объект к которому выполняется запрос
+        self.__slave = None
+        self.__connection = False
+
     @abstractproperty
     def numAnswerDataBytes(self):
         """ Кол-во байтов данных в пакете (не старших и младших) """
@@ -47,19 +65,22 @@ class DeviceCommand():
         return CommandConst.unknown
 
     def numAnswerBytes(self):
-        number = self.START_COMMAND_CRC_SIZE + self.DATA_BYTE_SIZE
-        + self.numAnswerDataBytes()
+        number = self.START_COMMAND_CRC_SIZE + self.DATA_BYTE_SIZE \
+            + self.numAnswerDataBytes
         return number
 
-    def __init__(self, port, address, slave):
-        self.__portDescriptor = port
-        self.__address = address
-        # self.__data = None
-        # объект к которому выполняется запрос
-        self.__slave = None
-        self.__connection = False
+    @abstractmethod
+    def packagingData(self, inOutPackage): pass
 
-    # @abstractmthod
+    @abstractmethod
+    def parseData(self, data): pass
+
+    @abstractmethod
+    def saveDataInSlave(self, data): pass
+
+    # @abstractmethod
+    # def getSlaveData(self): pass
+
     def execute(self):
         """Выполнение запроса к устройству
         с ожиданием ответа
@@ -78,13 +99,18 @@ class DeviceCommand():
 
         # определяем что ответ валидный
         # слейв понял нашу команду и выполнил
-        self.answerValid(answer)
+        if (not self.answerValid(answer)):
+            return False
 
         # берём из ответного пакета данные
         data = self.getDataFromAnswer(answer)
 
+        formattedData = self.parseData(data)
+
         # сохраняем данные с помощью функций слейва.
-        self.saveDataInSlave(data)
+        self.saveDataInSlave(formattedData)
+
+        return True
 
     def send(self, package):
         return self.__portDescriptor.write(package)
@@ -92,20 +118,58 @@ class DeviceCommand():
     def receive(self):
         return self.__portDescriptor.read(self.numAnswerBytes())
 
-    @abstractmethod
-    def answerValid(self, answer): pass
+    def answerValid(self, answer):
+        """ Определение валидности ответного пакета """
+        # длина должна быть больше или равна минимальному возм. размеру
+        if len(answer) < self.START_COMMAND_CRC_SIZE:
+            return False
 
-    @abstractmethod
-    def getDataFromAnswer(self, answer): pass
+        # получателем должен быть мастер 0x80
+        if 0x80 != ord(answer[0]):
+            return False
 
-    @abstractmethod
-    def saveDataInSlave(self, data): pass
+        # считаем сrc и сравниваем с тем, что получили
+        receiveCrc = self._getDataFromBytes(
+                answer[-2], answer[-1])
+        countCrcValue = self._countPackageCRC(answer[:-2])
 
-    @abstractmethod
-    def packagingData(self): pass
+        if (receiveCrc != countCrcValue):
+            return False
 
-    @abstractmethod
-    def getSlaveData(self): pass
+        # Если слейв понял команду установки значений, то он возвращает
+        # в коде команды 0x80
+        # Если не понял, то в поле команды выставляется 0x81
+        # Если команда получения значения, то в ответе дублируется.
+        receiveCommand = self._getDataFromBytes(answer[1], answer[2])
+
+        if receiveCommand == 0x81:
+            return False
+
+        if CommandConst.commandTypeIsGet(self.commandCode) and \
+           self.commandCode == receiveCommand:
+            pass
+
+        elif CommandConst.commandTypeIsSet(self.commandCode) and \
+                receiveCommand == 0x80:
+            pass
+        else:
+            return False
+
+        # валидное ли кол-во данных у пакета
+        if self.answerDataValid(answer[3:-2]):
+            return True
+        return False
+
+    def _answerDataValid(self, answerData):
+        """ Определяем правльное ли число байт мы ожидали """
+        if 0 == len(answerData):
+            answerLen = 0
+        else:
+            answerLen = len(answerData) / 2
+
+        if answerLen == self.numAnswerDataBytes:
+            return True
+        return False
 
     def createPackage(self):
         package = []
@@ -226,3 +290,55 @@ class DeviceCommand():
         # logPackage.debug("CRC: %s Lbyte: %s",
         #                  "{0}(0b{0:08b})".format(crc), bin(crcL))
         return crcL
+
+    def _printBytes(self, array, receiveSend=''):
+        if array is None:
+            return
+        for index, byte in enumerate(array):
+            if not isinstance(byte, list):
+                byteList = [byte]
+            else:
+                byteList = byte
+            for listIndex, byteR in enumerate(byteList):
+                # Отправляем мы массив байт, а получаем массив str
+                # так что надо проверить, и если необходимо преобразовать в int
+                if isinstance(byteR, int):
+                    binHexStr = 'int: {0:>5d} hex: 0x{0:>02x}' \
+                                '   bin: 0b{0:>08b}".format(byteR)'
+                else:
+                    binHexStr = 'int: {0:>5d} hex: 0x{0:>02x}' \
+                                '   bin: 0b{0:>08b}".format(ord(byteR))'
+                print(" %s [%2d] %s", receiveSend, index + listIndex,
+                      binHexStr)
+                # logDevice.debug(" %s [%2d] %s",
+                #                 receiveSend,
+                #                 index + listIndex,
+                #                 binHexStr)
+
+    def _getDataFromBytes(self, hightByte, lowByte):
+        """ Функция получения байта данных из двух пакетных байтов"""
+        hightData = (ord(hightByte) & 0x0f) << 4
+
+        if lowByte is None:
+            lowData = 0x00
+        else:
+            lowData = (ord(lowByte) & 0x0f)
+
+        return hightData | lowData
+
+    def getDataFromAnswer(self, answer):
+        """ Получение чистых данных пакета. на выходе список """
+        # исключаем стартовый байт, байты комманды, crc
+        packageData = answer[3:-2]
+
+        realData = []
+        for i in range(0, len(packageData), 2):
+            if len(packageData) - 1 != i:
+                realDataByte = self._getDataFromBytes(
+                    packageData[i], packageData[i+1])
+            else:
+                realDataByte = self._getDataFromBytes(
+                    packageData[i], None)
+            realData.extend([realDataByte])
+
+        return realData
