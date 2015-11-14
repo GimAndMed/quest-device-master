@@ -10,12 +10,13 @@ class SetSmartOneLeds(DeviceCommand):
         подписанному на плате 1му светодиоду.
         Далее 2 байта яркости на R канал, 2а байта на G, 2а байта на B.
         Из 2х байт используется только младшие 12 бит.
+        7 байт данных в посылке.
     """
     # код команды
     commandCode = CommandConst.setSmartOneLeds
 
     # кол-во целых байт данных в ответе
-    numAnswerDataBytes = 2
+    numAnswerDataBytes = 0
 
     def packagingData(self, inOutPackage, data):
         """ Упаковываем данные для отправки.
@@ -30,10 +31,6 @@ class SetSmartOneLeds(DeviceCommand):
 
         dataPackage = self._packedInDataSmartOneLEDs(data[1:])
         inOutPackage.extend(dataPackage)
-
-        # считаем и упаковывае crc
-        crcPackageBytes = self._createCRCPackageBytes(inOutPackage)
-        inOutPackage.extend(crcPackageBytes)
 
         return inOutPackage
 

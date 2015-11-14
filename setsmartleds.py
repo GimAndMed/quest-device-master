@@ -57,10 +57,6 @@ class SetSmartLeds(DeviceCommand):
             dataPackageBytes = self._createPackageDataBytes(dataByte)
             inOutPackage.extend(dataPackageBytes)
 
-        # считаем и упаковывае crc
-        crcPackageBytes = self._createCRCPackageBytes(inOutPackage)
-        inOutPackage.extend(crcPackageBytes)
-
         return inOutPackage
 
     def parseData(self, data):
