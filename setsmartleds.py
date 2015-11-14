@@ -12,7 +12,7 @@ class SetSmartLeds(DeviceCommand):
     # кол-во целых байт данных в ответе
     numAnswerDataBytes = 0
 
-    def packagingData(self, inOutPackage):
+    def packagingData(self, inOutPackage, data):
         """ Упаковываем данные для отправки.
             Создание пакета для установки значений умных светодиодов
             24 * 4 = 96 LEDs; 96 * 3  = 288 - элементов в списке data

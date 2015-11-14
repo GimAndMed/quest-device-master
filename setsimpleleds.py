@@ -23,13 +23,13 @@ class setSimpleLeds(DeviceCommand):
     # кол-во целых байт данных в ответе
     numAnswerDataBytes = 10
 
-    def packagingData(self, inOutPackage):
+    def packagingData(self, inOutPackage, data):
         """ Упаковываем данные для отправки """
         leds = self.__slave.getSimpleLeds()
 
         # упаковываем данные
         for dataBayteId in range(0, len(leds), 8):
-            dataByteList = leds[dataBayteId:dataBayteId+8]
+            dataByteList = leds[dataBayteId:dataBayteId + 8]
 
             # преобразуем массив битов в Байт
             # в старшем бите байта светодиод со старшим номером

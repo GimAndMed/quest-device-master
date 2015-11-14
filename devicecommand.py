@@ -46,10 +46,10 @@ class DeviceCommand():
     # Одни байт данных в пакете занимает 2 (старший и младший)
     DATA_BYTE_SIZE = 2
 
-    def __init__(self, port, address, slave):
+    def __init__(self, port, address, data, slave):
         self.__portDescriptor = port
         self.__address = address
-        # self.__data = None
+        self.__data = data
         # объект к которому выполняется запрос
         self.__slave = None
         self.__connection = False
@@ -70,7 +70,7 @@ class DeviceCommand():
         return number
 
     @abstractmethod
-    def packagingData(self, inOutPackage): pass
+    def packagingData(self, inOutPackage, data): pass
 
     @abstractmethod
     def parseData(self, data): pass
@@ -89,7 +89,7 @@ class DeviceCommand():
         pass
 
         # создаём пакет
-        package = self.createPackage()
+        package = self.createPackage(self.__data)
 
         # отправляем его в порт
         self.send(package)
@@ -130,7 +130,7 @@ class DeviceCommand():
 
         # считаем сrc и сравниваем с тем, что получили
         receiveCrc = self._getDataFromBytes(
-                answer[-2], answer[-1])
+            answer[-2], answer[-1])
         countCrcValue = self._countPackageCRC(answer[:-2])
 
         if (receiveCrc != countCrcValue):
@@ -171,7 +171,7 @@ class DeviceCommand():
             return True
         return False
 
-    def createPackage(self):
+    def createPackage(self, data):
         package = []
 
         startByte = self._createPackageByte(self.PackageIndicator.new,
@@ -184,7 +184,7 @@ class DeviceCommand():
         package.extend(commandPackageBytes)
 
         # упаковываем данные
-        package = self.packagingData(package)
+        package = self.packagingData(package, data)
 
         # считаем и упаковывае crc
         crcPackageBytes = self._createCRCPackageBytes(package)
@@ -335,7 +335,7 @@ class DeviceCommand():
         for i in range(0, len(packageData), 2):
             if len(packageData) - 1 != i:
                 realDataByte = self._getDataFromBytes(
-                    packageData[i], packageData[i+1])
+                    packageData[i], packageData[i + 1])
             else:
                 realDataByte = self._getDataFromBytes(
                     packageData[i], None)
