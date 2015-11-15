@@ -21,7 +21,7 @@ class setSimpleLeds(DeviceCommand):
     commandCode = CommandConst.setSimpleLeds
 
     # кол-во целых байт данных в ответе
-    numAnswerDataBytes = 10
+    numAnswerDataBytes = 0
 
     def packagingData(self, inOutPackage, data):
         """ Упаковываем данные для отправки """
