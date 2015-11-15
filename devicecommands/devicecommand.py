@@ -2,38 +2,16 @@
 # -*- coding: utf-8 -*-
 
 from abc import ABCMeta, abstractmethod, abstractproperty
+from commandcode import Command, commandTypeIsGet, commandTypeIsSet
+import logging
 
-
-class CommandConst:
-    """"""
-    connectionCheck = 0x00
-    changeSpeed = 0x01
-
-    setSimpleLeds = 0x10
-    setSmartLeds = 0x11
-    setSmartOctetLeds = 0x14
-    setSmartQuartetLeds = 0x15
-    setSmartOneLeds = 0x16
-    setLCD = 0x12
-    setRelays = 0x13
-
-    getButtons = 0x20
-    getADC = 0x21
-    getEncoders = 0x22
-    getSensor = 0x23
-    getStuckButtons = 0x24
-    getAllStates = 0x2F
-    unknown = 0x56
-
-    def commandTypeIsSet(self, commandCode):
-        if (commandCode >> 4) & 0x0f <= 1:
-            return True
-        return False
-
-    def commandTypeIsGet(self, commandCode):
-        if (commandCode >> 4) & 0x0f == 2:
-            return True
-        return False
+# для отладочного вывода
+logging.basicConfig(
+    format=u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s%(message)s',
+    level=logging.DEBUG)
+logPackage = logging.getLogger('package')
+# logging.disable(logging.DEBUG)
+logging.disable(logging.NOTSET)
 
 
 class DeviceCommand():
@@ -49,13 +27,13 @@ class DeviceCommand():
     def __init__(self, port=None, address=None, data=None, slave=None):
         self.init(port, address, data, slave)
 
-    def init(self, port, address, data, slave):
-        self.__portDescriptor = port
-        self.__address = address
-        self.__data = data
+    def init(self, port, address, data=None, slave=None):
+        self.portDescriptor = port
+        self.address = address
+        self.data = data
         # объект к которому выполняется запрос
-        self.__slave = slave
-        self.__connection = False
+        self.slave = slave
+        self.connection = False
 
     @abstractproperty
     def numAnswerDataBytes(self):
@@ -64,8 +42,8 @@ class DeviceCommand():
 
     @abstractproperty
     def commandCode(self):
-        """ Код команды, или тип, содержится в классе CommandConst """
-        return CommandConst.unknown
+        """ Код команды, или тип, содержится в классе Command """
+        return Command.unknown
 
     def numAnswerBytes(self):
         number = self.START_COMMAND_CRC_SIZE + \
@@ -89,10 +67,12 @@ class DeviceCommand():
         с ожиданием ответа
         Выполняется создание соответствующего команде
         пакета. Его отправка и приём от устройства результата."""
-        pass
+
+        logging.info("Command << {command} >> created".format(
+            command=self.__class__.__name__))
 
         # создаём пакет
-        package = self.createPackage(self.__data)
+        package = self.createPackage(self.data)
 
         # отправляем его в порт
         self.send(package)
@@ -113,18 +93,33 @@ class DeviceCommand():
         # сохраняем данные с помощью функций слейва.
         self.saveDataInSlave(formattedData)
 
-        return True, formattedData
+        if formattedData is None:
+            returnValue = True
+        else:
+            returnValue = formattedData
+
+        logging.info("return: \n\t{}".format(returnValue))
+
+        return returnValue
 
     def send(self, package):
-        return self.__portDescriptor.write(package)
+        return self.portDescriptor.write(package)
 
     def receive(self):
-        return self.__portDescriptor.read(self.numAnswerBytes())
+        return self.portDescriptor.read(self.numAnswerBytes())
 
     def answerValid(self, answer):
         """ Определение валидности ответного пакета """
         # длина должна быть больше или равна минимальному возм. размеру
+
         if len(answer) < self.START_COMMAND_CRC_SIZE:
+            logging.info('[AnswerValid: answer length error] Command:'
+                         ' {command} | expect less than {expectLen} |'
+                         ' actualy: {actualyLen}'.format(
+                             command=self.__class__.__name__,
+                             expectLen=self.START_COMMAND_CRC_SIZE,
+                             actualyLen=len(answer)
+                         ))
             return False
 
         # получателем должен быть мастер 0x80
@@ -148,18 +143,18 @@ class DeviceCommand():
         if receiveCommand == 0x81:
             return False
 
-        if CommandConst.commandTypeIsGet(self.commandCode) and \
-           self.commandCode == receiveCommand:
+        if commandTypeIsGet(self.commandCode) and \
+                self.commandCode == receiveCommand:
             pass
 
-        elif CommandConst.commandTypeIsSet(self.commandCode) and \
+        elif commandTypeIsSet(self.commandCode) and \
                 receiveCommand == 0x80:
             pass
         else:
             return False
 
         # валидное ли кол-во данных у пакета
-        if self.answerDataValid(answer[3:-2]):
+        if self._answerDataValid(answer[3:-2]):
             return True
         return False
 
@@ -179,7 +174,7 @@ class DeviceCommand():
 
         startByte = self._createPackageByte(self.PackageIndicator.new,
                                             None, None,
-                                            self.__address, None)
+                                            self.address, None)
         package.append(startByte)
 
         # создаём байты команды
@@ -307,10 +302,10 @@ class DeviceCommand():
                 # так что надо проверить, и если необходимо преобразовать в int
                 if isinstance(byteR, int):
                     binHexStr = 'int: {0:>5d} hex: 0x{0:>02x}' \
-                                '   bin: 0b{0:>08b}".format(byteR)'
+                        '   bin: 0b{0:>08b}".format(byteR)'
                 else:
                     binHexStr = 'int: {0:>5d} hex: 0x{0:>02x}' \
-                                '   bin: 0b{0:>08b}".format(ord(byteR))'
+                        '   bin: 0b{0:>08b}".format(ord(byteR))'
                 print(" %s [%2d] %s", receiveSend, index + listIndex,
                       binHexStr)
                 # logDevice.debug(" %s [%2d] %s",

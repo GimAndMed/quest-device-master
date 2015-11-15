@@ -1,12 +1,13 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from devicecommand import DeviceCommand, CommandConst
+from devicecommand import DeviceCommand
+from commandcode import Command
 
 
 class ConnectionCheck(DeviceCommand):
 
-    commandCode = CommandConst.connectionCheck
+    commandCode = Command.connectionCheck
 
     numAnswerDataBytes = 7
 
@@ -24,7 +25,7 @@ class ConnectionCheck(DeviceCommand):
 
     def saveDataInSlave(self, data):
         pass
-        # self.__slave.saveConnectionCheck()
+        # self.slave.saveConnectionCheck()
 
     def _answerDataValid(self, data):
         """ Проверяем, получили ли мы в ответе Hello! """
@@ -41,7 +42,7 @@ class ConnectionCheck(DeviceCommand):
 
     def printInfo(self):
         print "Bytes size: ", self.numAnswerBytes(), \
-                " Code: ", self.commandCode
+            " Code: ", self.commandCode
 
 
 if __name__ == '__main__':

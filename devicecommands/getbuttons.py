@@ -1,20 +1,16 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from devicecommand import DeviceCommand, CommandConst
+from devicecommand import DeviceCommand
+from commandcode import Command
 
 
-class GetStuckButtons(DeviceCommand):
-    """Получить значения "залипших" кнопок.
-        Кнопок, чьё состояние сохраняется при нажатии и сбрасывается,
-            только при считывании.
-        Команда для кнопок, чьё состояние можно не успеть считать
-            вовремя.
+class GetButtons(DeviceCommand):
+    """Получить значения кнопок.
         В ответ 3 байта, используемые биты 0 – 17. Бит 0 всегда 0.
     """
-
     # код команды
-    commandCode = CommandConst.getStuckButtons
+    commandCode = Command.getButtons
 
     # кол-во целых байт данных в ответе
     numAnswerDataBytes = 3
@@ -41,5 +37,5 @@ class GetStuckButtons(DeviceCommand):
     def saveDataInSlave(self, data):
         """Если дескриптор слейва известен, то сохраняем данные,
         используя его интерфейс."""
-        if self.__slave is not None:
-            self.__slave.saveStuckButtons(data)
+        if self.slave is not None:
+            self.slave.saveButtons(data)

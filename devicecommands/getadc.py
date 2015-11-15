@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from devicecommand import DeviceCommand, CommandConst
+from devicecommand import DeviceCommand
+from commandcode import Command
 
 
 class GetADC(DeviceCommand):
@@ -10,7 +11,7 @@ class GetADC(DeviceCommand):
     """
 
     # код команды
-    commandCode = CommandConst.getADC
+    commandCode = Command.getADC
 
     # кол-во целых байт данных в ответе
     numAnswerDataBytes = 8
@@ -33,5 +34,5 @@ class GetADC(DeviceCommand):
     def saveDataInSlave(self, data):
         """Если дескриптор слейва известен, то сохраняем данные,
         используя его интерфейс."""
-        if self.__slave is not None:
-            self.__slave.saveADC(data)
+        if self.slave is not None:
+            self.slave.saveADC(data)

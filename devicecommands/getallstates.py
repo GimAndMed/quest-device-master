@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from devicecommand import DeviceCommand, CommandConst
+from devicecommand import DeviceCommand
+from commandcode import Command
 
 from getbuttons import GetButtons
 
@@ -24,25 +25,10 @@ class GetAllStates(DeviceCommand):
     """
 
     # код команды
-    commandCode = CommandConst.getAllStates
+    commandCode = Command.getAllStates
 
     # кол-во целых байт данных в ответе
     numAnswerDataBytes = 24
-
-    buttonsAnswerDataBytes = GetButtons.numAnswerDataBytes
-    buttonsParseData = GetButtons.parseData
-
-    adcAnswerDataBytes = GetADC.numAnswerDataBytes
-    adcParseData = GetADC.parseData
-
-    encodersAnswerDataBytes = GetEncoders.numAnswerDataBytes
-    encodersParseData = GetEncoders.parseData
-
-    sensorAnswerDataBytes = GetSensor.numAnswerDataBytes
-    sensorParseData = GetSensor.parseData
-
-    stuckButtonsAnswerDataBytes = GetStuckButtons.numAnswerDataBytes
-    stuckButonsParseData = GetStuckButtons.parseData
 
     def packagingData(self, inOutPackage, data):
         """ Упаковываем данные для отправки
@@ -71,51 +57,52 @@ class GetAllStates(DeviceCommand):
 
         # Простые кнопки
         # получаем данные из массива
+        buttonsAnswerDataBytes = GetButtons.numAnswerDataBytes
         buttonsData = data[0:buttonsAnswerDataBytes]
         # парсим функцией другого модуля, отвечающего за кнопки
-        buttonsList = buttonsParseData(buttonsData)
-        # buttonsList = self._parseGetButtonsData(data[0:3])
+        buttonsList = GetButtons().parseData(buttonsData)
+        print buttonsList
         result.append(buttonsList)
+        dataIndex = dataIndex + buttonsAnswerDataBytes
 
         # АЦП
         # меняем смещение входного массива на кол-во считанных элементов
         # в предыдущем блоке.
-        dataIndex = dataIndex + buttonsAnswerDataBytes
+
+        adcAnswerDataBytes = dataIndex + GetADC.numAnswerDataBytes
         adcData = data[dataIndex:adcAnswerDataBytes]
         # парсим функцией другого модуля, отвечающего за АЦП
-        adcList = adcParseData(adcData)
-        # adcList = self._parseGetADCData(data[3:3 + 8])
+        adcList = GetADC().parseData(adcData)
         result.append(adcList)
+        dataIndex = adcAnswerDataBytes
 
         # Енкодеры
         # меняем смещение входного массива на кол-во считанных элементов
         # в предыдущем блоке.
-        dataIndex = dataIndex + adcAnswerDataBytes
+        encodersAnswerDataBytes = dataIndex + GetEncoders.numAnswerDataBytes
         encodersData = data[dataIndex:encodersAnswerDataBytes]
         # парсим функцией другого модуля, отвечающего за енкодеры
-        encodersList = encodersParseData(encodersData)
-        # encoderList = self._parseGetEncoderData(data[3 + 8:3 + 2 * 8])
+        encodersList = GetEncoders().parseData(encodersData)
         result.append(encodersList)
+        dataIndex = encodersAnswerDataBytes
 
         # Сенсоры
         # меняем смещение входного массива на кол-во считанных элементов
         # в предыдущем блоке.
-        dataIndex = dataIndex + encodersAnswerDataBytes
+        sensorAnswerDataBytes = dataIndex + GetSensor.numAnswerDataBytes
         sensorData = data[dataIndex:sensorAnswerDataBytes]
         # парсим функцией другого модуля, отвечающего за сенсоры
-        sensorList = sensorParseData(sensorData)
-        # sensorList = self._parseGetSensorData(data[3 + 2 * 8:3 + 2 * 8 + 2])
+        sensorList = GetSensor().parseData(sensorData)
         result.append(sensorList)
+        dataIndex = sensorAnswerDataBytes
 
         # "Залипшие кнопки"
         # меняем смещение входного массива на кол-во считанных элементов
         # в предыдущем блоке.
-        dataIndex = dataIndex + sensorAnswerDataBytes
+        stuckButtonsAnswerDataBytes = dataIndex + GetStuckButtons.numAnswerDataBytes
         stuckButtonsData = data[dataIndex:stuckButtonsAnswerDataBytes]
         # парсим функцией другого модуля, отвечающего за залипшие кнопки
-        stuckButtonsList = stuckButonsParseData(stuckButtonsData)
-        # stuckButtons = self._parseGetButtonsData(
-        #     data[3 + 2 * 8 + 2:3 + 2 * 8 + 2 + 8])
+        stuckButtonsList = GetStuckButtons().parseData(stuckButtonsData)
         result.append(stuckButtonsList)
 
         return result
@@ -123,9 +110,9 @@ class GetAllStates(DeviceCommand):
     def saveDataInSlave(self, data):
         """Если дескриптор слейва известен, то сохраняем данные,
         используя его интерфейс."""
-        if self.__slave is not None:
-            self.__slave.saveButtons(data[0])
-            self.__slave.saveADC(data[1])
-            self.__slave.saveEncoders(data[2])
-            self.__slave.saveSensor(data[3])
-            self.__slave.saveStuckButtons(data[4])
+        if self.slave is not None:
+            self.slave.saveButtons(data[0])
+            self.slave.saveADC(data[1])
+            self.slave.saveEncoders(data[2])
+            self.slave.saveSensor(data[3])
+            self.slave.saveStuckButtons(data[4])

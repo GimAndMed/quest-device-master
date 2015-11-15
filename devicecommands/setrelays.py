@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from devicecommand import DeviceCommand, CommandConst
+from devicecommand import DeviceCommand
+from commandcode import Command
 
 
 class SetRelays(DeviceCommand):
@@ -14,7 +15,7 @@ class SetRelays(DeviceCommand):
     """
 
     # код команды
-    commandCode = CommandConst.setRelays
+    commandCode = Command.setRelays
 
     # кол-во целых байт данных в ответе
     numAnswerDataBytes = 0

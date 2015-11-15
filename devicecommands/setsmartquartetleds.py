@@ -1,19 +1,19 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from devicecommand import DeviceCommand, CommandConst
+from devicecommand import DeviceCommand
+from commandcode import Command
 
 
-class SetSmartOctetLeds(DeviceCommand):
-    """Установить выборочное значение 8ми умных светодиодов.
-        В данных 1н байт номер драйвера (0-3) и 36 байт значения
-        светодиодов по 12 бит на канал светодиода.
-        При этом номер драйвера 0 управляет  LED1 — LED8,
-         номер 1 - LED9 — LED16...
-        В данных 37 байт
+class SetSmartQuartetLeds(DeviceCommand):
+    """Установить выборочное значение 4х умных светодиодов.
+        В данных 1н байт номер ПОЛОВИНЫ драйвера (0-7) и
+        18 байт значения светодиодов по 12 бит на канал светодиода.
+        При этом номер ПОЛОВИНЫ драйвера 0 управляет  LED1 — LED4,
+        номер 1 - LED5 — LED8...
     """
     # код команды
-    commandCode = CommandConst.setSmartOctetLeds
+    commandCode = Command.setSmartOctetLeds
 
     # кол-во целых байт данных в ответе
     numAnswerDataBytes = 0
@@ -23,7 +23,8 @@ class SetSmartOctetLeds(DeviceCommand):
             Всё как в отправке большого массива.
             Только первый байт данных - номер половины драйвера.
         """
-        # Вставляем в пакет номер ПОЛОВИНЫ драйвера.
+
+        # Вставляем в пакет номер драйвера.
         # При этом 0 управляет  LED1 — LED4, номер 1 - LED5 — LED8...
         dataPackageBytes = self._createPackageDataBytes(data[0])
         inOutPackage.extend(dataPackageBytes)

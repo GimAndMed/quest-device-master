@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from devicecommand import DeviceCommand, CommandConst
+from devicecommand import DeviceCommand
+from commandcode import Command
 
 
 class SetLCD(DeviceCommand):
@@ -10,7 +11,7 @@ class SetLCD(DeviceCommand):
     """
 
     # код команды
-    commandCode = CommandConst.setLCD
+    commandCode = Command.setLCD
 
     # кол-во целых байт данных в ответе
     numAnswerDataBytes = 0

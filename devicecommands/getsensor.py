@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from devicecommand import DeviceCommand, CommandConst
+from devicecommand import DeviceCommand
+from commandcode import Command
 
 
 class GetSensor(DeviceCommand):
@@ -11,7 +12,7 @@ class GetSensor(DeviceCommand):
     """
 
     # код команды
-    commandCode = CommandConst.getSensor
+    commandCode = Command.getSensor
 
     # кол-во целых байт данных в ответе
     numAnswerDataBytes = 2
@@ -33,5 +34,5 @@ class GetSensor(DeviceCommand):
     def saveDataInSlave(self, data):
         """Если дескриптор слейва известен, то сохраняем данные,
         используя его интерфейс."""
-        if self.__slave is not None:
-            self.__slave.saveSensor(data)
+        if self.slave is not None:
+            self.slave.saveSensor(data)

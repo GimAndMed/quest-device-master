@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from devicecommand import DeviceCommand, CommandConst
+from devicecommand import DeviceCommand
+from commandcode import Command
 
 
 class SetSmartOneLeds(DeviceCommand):
@@ -13,7 +14,7 @@ class SetSmartOneLeds(DeviceCommand):
         7 байт данных в посылке.
     """
     # код команды
-    commandCode = CommandConst.setSmartOneLeds
+    commandCode = Command.setSmartOneLeds
 
     # кол-во целых байт данных в ответе
     numAnswerDataBytes = 0

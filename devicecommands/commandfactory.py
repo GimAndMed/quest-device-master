@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from devicecommand import CommandConst
+from commandcode import Command
 
 # Общие команды
 from connectioncheck import ConnectionCheck
@@ -35,39 +35,39 @@ class CommandFactory:
     def createCommand(self, commandCode,
                       port=None, address=None, data=None, slave=None):
         # Общие команды
-        if (CommandConst.connectionCheck == commandCode):
+        if (Command.connectionCheck == commandCode):
             command = ConnectionCheck(port, address, data, slave)
-        elif (CommandConst.changeSpeed == commandCode):
+        elif (Command.changeSpeed == commandCode):
             command = ChangeSpeed(port, address, data, slave)
 
         # Команды установки значений
-        elif (CommandConst.setSimpleLeds == commandCode):
+        elif (Command.setSimpleLeds == commandCode):
             command = SetSimpleLeds(port, address, data, slave)
-        elif (CommandConst.setSmartOneLeds == commandCode):
+        elif (Command.setSmartOneLeds == commandCode):
             command = SetSmartOneLeds(port, address, data, slave)
-        elif (CommandConst.setSmartQuartetLeds == commandCode):
+        elif (Command.setSmartQuartetLeds == commandCode):
             command = SetSmartQuartetLeds(port, address, data, slave)
-        elif (CommandConst.setSmartOctetLeds == commandCode):
+        elif (Command.setSmartOctetLeds == commandCode):
             command = SetSmartOctetLeds(port, address, data, slave)
-        elif (CommandConst.setSmartLeds == commandCode):
+        elif (Command.setSmartLeds == commandCode):
             command = SetSmartLeds(port, address, data, slave)
-        elif (CommandConst.setLCD == commandCode):
+        elif (Command.setLCD == commandCode):
             command = SetLCD(port, address, data, slave)
-        elif (CommandConst.setRelays == commandCode):
+        elif (Command.setRelays == commandCode):
             command = SetRelays(port, address, data, slave)
 
         # Команды получения значений
-        elif (CommandConst.getButtons == commandCode):
+        elif (Command.getButtons == commandCode):
             command = GetButtons(port, address, data, slave)
-        elif (CommandConst.getStuckButtons == commandCode):
+        elif (Command.getStuckButtons == commandCode):
             command = GetStuckButtons(port, address, data, slave)
-        elif (CommandConst.getADC == commandCode):
+        elif (Command.getADC == commandCode):
             command = GetADC(port, address, data, slave)
-        elif (CommandConst.getEncoders == commandCode):
+        elif (Command.getEncoders == commandCode):
             command = GetEncoders(port, address, data, slave)
-        elif (CommandConst.getSensor == commandCode):
+        elif (Command.getSensor == commandCode):
             command = GetSensor(port, address, data, slave)
-        elif (CommandConst.getAllStates == commandCode):
+        elif (Command.getAllStates == commandCode):
             command = GetAllStates(port, address, data, slave)
 
         return command

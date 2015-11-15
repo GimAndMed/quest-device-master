@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from devicecommand import DeviceCommand, CommandConst
+from devicecommand import DeviceCommand
+from commandcode import Command
 
 
 class SetSimpleLeds(DeviceCommand):
@@ -18,14 +19,14 @@ class SetSimpleLeds(DeviceCommand):
         ((22-1)*3 + 0 «R» смещение = 63 бит)."""
 
     # код команды
-    commandCode = CommandConst.setSimpleLeds
+    commandCode = Command.setSimpleLeds
 
     # кол-во целых байт данных в ответе
     numAnswerDataBytes = 0
 
     def packagingData(self, inOutPackage, data):
         """ Упаковываем данные для отправки """
-        leds = self.__slave.getSimpleLeds()
+        leds = self.slave.getSimpleLeds()
 
         # упаковываем данные
         for dataBayteId in range(0, len(leds), 8):

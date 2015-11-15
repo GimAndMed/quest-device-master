@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from devicecommand import DeviceCommand, CommandConst
+from devicecommand import DeviceCommand
+from commandcode import Command
 from time import sleep
 
 
@@ -23,7 +24,7 @@ class ChangeSpeed(DeviceCommand):
     """
 
     # код команды
-    commandCode = CommandConst.changeSpeed
+    commandCode = Command.changeSpeed
 
     # кол-во целых байт данных в ответе
     numAnswerDataBytes = 0
@@ -42,24 +43,24 @@ class ChangeSpeed(DeviceCommand):
 
     # переопределяем функцию отправки, для смены скорости
     def send(self, package):
-        numBytesSend = self.__portDescriptor.write(package)
+        numBytesSend = self.portDescriptor.write(package)
 
         self._setNewSpeed()
 
         return numBytesSend
 
     def _setNewSpeed(self):
-        speedID = self.__data
+        speedID = self.data
         if speedID < 0 or speedID >= len(self.baudrateList):
             print "Speed do not changed - wrong speedID: ", speedID
             return
-        self.__portDescriptor.flush()
+        self.portDescriptor.flush()
         sleep(1)
-        oldBaudrate = self.__portDescriptor.baudrate
-        self.__portDescriptor.baudrate = self.baudrateList[speedID]
-        self.__portDescriptor.close()
+        oldBaudrate = self.portDescriptor.baudrate
+        self.portDescriptor.baudrate = self.baudrateList[speedID]
+        self.portDescriptor.close()
         sleep(1)
-        self.__portDescriptor.open()
+        self.portDescriptor.open()
         print "Speed changed from {0} to {1}: ".format(
             self.baudrateList[speedID], oldBaudrate)
         sleep(1)
