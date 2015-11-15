@@ -46,12 +46,15 @@ class DeviceCommand():
     # Одни байт данных в пакете занимает 2 (старший и младший)
     DATA_BYTE_SIZE = 2
 
-    def __init__(self, port, address, data, slave):
+    def __init__(self, port=None, address=None, data=None, slave=None):
+        self.init(port, address, data, slave)
+
+    def init(self, port, address, data, slave):
         self.__portDescriptor = port
         self.__address = address
         self.__data = data
         # объект к которому выполняется запрос
-        self.__slave = None
+        self.__slave = slave
         self.__connection = False
 
     @abstractproperty

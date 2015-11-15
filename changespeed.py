@@ -5,7 +5,7 @@ from devicecommand import DeviceCommand, CommandConst
 from time import sleep
 
 
-class changeSpeed(DeviceCommand):
+class ChangeSpeed(DeviceCommand):
     """
         Установить скорость обмена.
         При включении платы скорость всегда 9600 бит/с. 1 байт данных:

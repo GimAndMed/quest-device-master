@@ -4,7 +4,7 @@
 from devicecommand import DeviceCommand, CommandConst
 
 
-class getEncoders(DeviceCommand):
+class GetEncoders(DeviceCommand):
     """Получить значение энкодеров.
        В ответ 8 байт (по 2а байта на крутилку). Значения LE.
        0 счетчик (16 бит) соответствует 0 крутилке.

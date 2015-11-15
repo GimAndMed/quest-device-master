@@ -4,7 +4,7 @@
 from devicecommand import DeviceCommand, CommandConst
 
 
-class getButtons(DeviceCommand):
+class GetButtons(DeviceCommand):
     """Получить значения кнопок.
         В ответ 3 байта, используемые биты 0 – 17. Бит 0 всегда 0.
     """

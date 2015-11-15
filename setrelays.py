@@ -4,7 +4,7 @@
 from devicecommand import DeviceCommand, CommandConst
 
 
-class setRelays(DeviceCommand):
+class SetRelays(DeviceCommand):
     """Установить значение реле:
         Бит 4 – реле 1.
         Бит 5 – реле 2.

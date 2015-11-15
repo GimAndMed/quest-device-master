@@ -4,7 +4,7 @@
 from devicecommand import DeviceCommand, CommandConst
 
 
-class getStuckButtons(DeviceCommand):
+class GetStuckButtons(DeviceCommand):
     """Получить значения "залипших" кнопок.
         Кнопок, чьё состояние сохраняется при нажатии и сбрасывается,
             только при считывании.

@@ -4,7 +4,7 @@
 from devicecommand import DeviceCommand, CommandConst
 
 
-class setSimpleLeds(DeviceCommand):
+class SetSimpleLeds(DeviceCommand):
     """Выводится массив из 10 байт. Каждому биту соответствует
         свой светодиод (всего 80 светодиодов).
         Соответственно 1 – включен, 0 – выключен. Байты должны

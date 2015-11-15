@@ -4,7 +4,7 @@
 from devicecommand import DeviceCommand, CommandConst
 
 
-class getSensor(DeviceCommand):
+class GetSensor(DeviceCommand):
     """Получить значения сенсорных кнопок.
     В ответ 2а байта – попугаи сенсорной кнопки 1 и попугаи
     сенсорной кнопки 2.

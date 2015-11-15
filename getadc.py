@@ -4,7 +4,7 @@
 from devicecommand import DeviceCommand, CommandConst
 
 
-class getADC(DeviceCommand):
+class GetADC(DeviceCommand):
     """Получить значения слайдеров и крутилок резистивных (каналы АЦП).
         В ответ 8 байт. 0 байт соответствует 0 каналу АЦП и т.д.
     """

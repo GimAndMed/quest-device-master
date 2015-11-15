@@ -4,7 +4,7 @@
 from devicecommand import DeviceCommand, CommandConst
 
 
-class setLCD(DeviceCommand):
+class SetLCD(DeviceCommand):
     """ Установить значения для отображения на ЖКИ
         Длина данных 80 байт.
     """

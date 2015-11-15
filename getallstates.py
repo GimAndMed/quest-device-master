@@ -3,23 +3,21 @@
 
 from devicecommand import DeviceCommand, CommandConst
 
-from getbuttons import numAnswerDataBytes as buttonsAnswerDataBytes
-from getbuttons import parseData as buttonsParseData
+from getbuttons import GetButtons
 
-from getadc import numAnswerDataBytes as adcAnswerDataBytes
-from getadc import parseData as adcParseData
+from getadc import GetADC
 
-from getencoders import numAnswerDataBytes as encodersAnswerDataBytes
-from getencoders import parseData as encodersParseData
+from getencoders import GetEncoders
+# from getencoders import parseData as encodersParseData
 
-from getsensor import numAnswerDataBytes as sensorAnswerDataBytes
-from getsensor import parseData as sensorParseData
+from getsensor import GetSensor
+# from getsensor import parseData as sensorParseData
 
-from getstuckbuttons import numAnswerDataBytes as stuckButtonsAnswerDataBytes
-from getStuckButtons import parseData as stuckButonsParseData
+from getstuckbuttons import GetStuckButtons
+# from getStuckButtons import parseData as stuckButonsParseData
 
 
-class getAllStates(DeviceCommand):
+class GetAllStates(DeviceCommand):
     """Получить значения сенсорных кнопок.
     В ответ 2а байта – попугаи сенсорной кнопки 1 и попугаи
     сенсорной кнопки 2.
@@ -30,6 +28,21 @@ class getAllStates(DeviceCommand):
 
     # кол-во целых байт данных в ответе
     numAnswerDataBytes = 24
+
+    buttonsAnswerDataBytes = GetButtons.numAnswerDataBytes
+    buttonsParseData = GetButtons.parseData
+
+    adcAnswerDataBytes = GetADC.numAnswerDataBytes
+    adcParseData = GetADC.parseData
+
+    encodersAnswerDataBytes = GetEncoders.numAnswerDataBytes
+    encodersParseData = GetEncoders.parseData
+
+    sensorAnswerDataBytes = GetSensor.numAnswerDataBytes
+    sensorParseData = GetSensor.parseData
+
+    stuckButtonsAnswerDataBytes = GetStuckButtons.numAnswerDataBytes
+    stuckButonsParseData = GetStuckButtons.parseData
 
     def packagingData(self, inOutPackage, data):
         """ Упаковываем данные для отправки
