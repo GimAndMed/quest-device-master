@@ -19,10 +19,10 @@ class CommandConst:
 
     getButtons = 0x20
     getADC = 0x21
-    getEncoder = 0x22
+    getEncoders = 0x22
     getSensor = 0x23
     getStuckButtons = 0x24
-    getAllState = 0x2F
+    getAllStates = 0x2F
     unknown = 0x56
 
     def commandTypeIsSet(self, commandCode):
@@ -110,7 +110,7 @@ class DeviceCommand():
         # сохраняем данные с помощью функций слейва.
         self.saveDataInSlave(formattedData)
 
-        return True
+        return True, formattedData
 
     def send(self, package):
         return self.__portDescriptor.write(package)
