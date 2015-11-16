@@ -9,7 +9,7 @@ import logging
 logging.basicConfig(
     format=u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s%(message)s',
     level=logging.DEBUG)
-logPackage = logging.getLogger('package')
+commandLogger = logging.getLogger('package')
 # logging.disable(logging.DEBUG)
 logging.disable(logging.NOTSET)
 
@@ -68,17 +68,22 @@ class DeviceCommand():
         Выполняется создание соответствующего команде
         пакета. Его отправка и приём от устройства результата."""
 
-        logging.info("Command << {command} >> created".format(
+        commandLogger.debug("Command << {command} >> ".format(
             command=self.__class__.__name__))
 
         # создаём пакет
         package = self.createPackage(self.data)
+        # печатаем
+        self._printPackage(package, "{} Send:".format(self.__class__.__name__))
 
         # отправляем его в порт
         self.send(package)
 
         # получаем ответ
         answer = self.receive()
+        # печатаем
+        self._printPackage(
+            answer, "{} Receive:".format(self.__class__.__name__))
 
         # определяем что ответ валидный
         # слейв понял нашу команду и выполнил
@@ -98,7 +103,7 @@ class DeviceCommand():
         else:
             returnValue = formattedData
 
-        logging.info("return: \n\t{}".format(returnValue))
+        logging.debug("return: \n\t{}".format(returnValue))
 
         return returnValue
 
@@ -114,7 +119,7 @@ class DeviceCommand():
 
         if len(answer) < self.START_COMMAND_CRC_SIZE:
             logging.info('[AnswerValid: answer length error] Command:'
-                         ' {command} | expect less than {expectLen} |'
+                         ' {command} | expect >= {expectLen} |'
                          ' actualy: {actualyLen}'.format(
                              command=self.__class__.__name__,
                              expectLen=self.START_COMMAND_CRC_SIZE,
@@ -124,6 +129,8 @@ class DeviceCommand():
 
         # получателем должен быть мастер 0x80
         if 0x80 != ord(answer[0]):
+            commandLogger.info("{command}: [Error] Answer startByte not for us! 0x80 = {startB}".format(
+                command=self.__class__.__name__, startB=answer[0]))
             return False
 
         # считаем сrc и сравниваем с тем, что получили
@@ -132,6 +139,9 @@ class DeviceCommand():
         countCrcValue = self._countPackageCRC(answer[:-2])
 
         if (receiveCrc != countCrcValue):
+            commandLogger.info("{command}: [Error] CRC answer! Expect: {expectCRC} Receive: {recCRC}".format(command=self.__class__.__name__,
+                                                                                                             expectCRC=countCrcValue,
+                                                                                                             recCRC=receiveCrc))
             return False
 
         # Если слейв понял команду установки значений, то он возвращает
@@ -141,6 +151,8 @@ class DeviceCommand():
         receiveCommand = self._getDataFromBytes(answer[1], answer[2])
 
         if receiveCommand == 0x81:
+            commandLogger.info("{command}: [Error] Slave return message: Unknown command".format(
+                command=self.__class__.__name__))
             return False
 
         if commandTypeIsGet(self.commandCode) and \
@@ -151,11 +163,16 @@ class DeviceCommand():
                 receiveCommand == 0x80:
             pass
         else:
+            commandLogger.info("{command}: [Error] Slave receive unknown command code".format(
+                self.__class__.__name__))
             return False
 
         # валидное ли кол-во данных у пакета
         if self._answerDataValid(answer[3:-2]):
             return True
+
+        commandLogger.info(
+            "{command}: [Error] Length data not valid".format(self.__class__.__name__))
         return False
 
     def _answerDataValid(self, answerData):
@@ -289,30 +306,6 @@ class DeviceCommand():
         #                  "{0}(0b{0:08b})".format(crc), bin(crcL))
         return crcL
 
-    def _printBytes(self, array, receiveSend=''):
-        if array is None:
-            return
-        for index, byte in enumerate(array):
-            if not isinstance(byte, list):
-                byteList = [byte]
-            else:
-                byteList = byte
-            for listIndex, byteR in enumerate(byteList):
-                # Отправляем мы массив байт, а получаем массив str
-                # так что надо проверить, и если необходимо преобразовать в int
-                if isinstance(byteR, int):
-                    binHexStr = 'int: {0:>5d} hex: 0x{0:>02x}' \
-                        '   bin: 0b{0:>08b}".format(byteR)'
-                else:
-                    binHexStr = 'int: {0:>5d} hex: 0x{0:>02x}' \
-                        '   bin: 0b{0:>08b}".format(ord(byteR))'
-                print(" %s [%2d] %s", receiveSend, index + listIndex,
-                      binHexStr)
-                # logDevice.debug(" %s [%2d] %s",
-                #                 receiveSend,
-                #                 index + listIndex,
-                #                 binHexStr)
-
     def _getDataFromBytes(self, hightByte, lowByte):
         """ Функция получения байта данных из двух пакетных байтов"""
         hightData = (ord(hightByte) & 0x0f) << 4
@@ -340,3 +333,90 @@ class DeviceCommand():
             realData.extend([realDataByte])
 
         return realData
+
+    def _printBytes(self, array, receiveSend=''):
+        if array is None:
+            return
+        for index, byte in enumerate(array):
+            if not isinstance(byte, list):
+                byteList = [byte]
+            else:
+                byteList = byte
+            for listIndex, byteR in enumerate(byteList):
+                # Отправляем мы массив байт, а получаем массив str
+                # так что надо проверить, и если необходимо преобразовать в int
+                if isinstance(byteR, int):
+                    binHexStr = 'int: {0:>5d} hex: 0x{0:>02x}' \
+                        '   bin: 0b{0:>08b}'.format(byteR)
+                else:
+                    binHexStr = 'int: {0:>5d} hex: 0x{0:>02x}' \
+                        '   bin: 0b{0:>08b}'.format(ord(byteR))
+                # print(" %s [%2d] %s", receiveSend, index + listIndex,
+                #      binHexStr)
+                commandLogger.debug(" %s [%2d] %s",
+                                    receiveSend,
+                                    index + listIndex,
+                                    binHexStr)
+
+    def _printPackage(self, array, receiveSend):
+
+        if array is None:
+            return
+
+        numPackageBytes = 0
+        for index, byte in enumerate(array):
+            if not isinstance(byte, list):
+                byteList = [byte]
+            else:
+                byteList = byte
+            numPackageBytes = numPackageBytes + len(byteList)
+
+        for index, byte in enumerate(array):
+            if not isinstance(byte, list):
+                byteList = [byte]
+            else:
+                byteList = byte
+            for listIndex, byteR in enumerate(byteList):
+                # Отправляем мы массив байт, а получаем массив str
+                # так что надо проверить, и если необходимо преобразовать в int
+                if isinstance(byteR, int):
+                    binHexStr = 'int: {0:>5d} hex: 0x{0:>02x}' \
+                        '   bin: 0b{0:>08b}'.format(byteR)
+                else:
+                    binHexStr = 'int: {0:>5d} hex: 0x{0:>02x}' \
+                        '   bin: 0b{0:>08b}'.format(ord(byteR))
+                # print(" %s [%2d] %s", receiveSend, index + listIndex,
+                #      binHexStr)
+                packageIndex = index + listIndex
+                dataByteCounter = packageIndex / 2
+
+                if packageIndex == 0:
+                    byteType = "startB"
+                elif 0 < packageIndex < 3:
+                    byteType = "CmdB"
+                elif 2 < packageIndex < numPackageBytes - 2:
+                    byteType = "dataB"
+                else:
+                    byteType = "crc"
+
+                if packageIndex % 2 == 0:
+                    byteType = byteType + "_L"
+                    byteNumber = ""
+                else:
+                    byteType = byteType + "_H"
+                    if 2 < packageIndex < numPackageBytes - 2:
+                        byteNumber = str(dataByteCounter)
+                    else:
+                        byteNumber = ""
+                # commandLogger.debug(" %s %8s [%2d, %2s] %s",
+                # receiveSend,
+                #                    byteType,
+                #                    packageIndex,
+                #                    byteNumber,
+                #                    binHexStr)
+                printStr = "{message} {byteType:8} [{dataNumber:2}, {byteNumber:2}] {binHexStr}"
+                commandLogger.debug(printStr.format(message=receiveSend,
+                                                    byteType=byteType,
+                                                    byteNumber=packageIndex,
+                                                    dataNumber=byteNumber,
+                                                    binHexStr=binHexStr))

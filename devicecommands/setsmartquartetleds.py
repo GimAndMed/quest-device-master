@@ -13,7 +13,7 @@ class SetSmartQuartetLeds(DeviceCommand):
         номер 1 - LED5 — LED8...
     """
     # код команды
-    commandCode = Command.setSmartOctetLeds
+    commandCode = Command.setSmartQuartetLeds
 
     # кол-во целых байт данных в ответе
     numAnswerDataBytes = 0

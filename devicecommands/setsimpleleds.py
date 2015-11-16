@@ -26,7 +26,8 @@ class SetSimpleLeds(DeviceCommand):
 
     def packagingData(self, inOutPackage, data):
         """ Упаковываем данные для отправки """
-        leds = self.slave.getSimpleLeds()
+        # leds = self.slave.getSimpleLeds()
+        leds = data
 
         # упаковываем данные
         for dataBayteId in range(0, len(leds), 8):

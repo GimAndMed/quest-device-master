@@ -61,7 +61,6 @@ class GetAllStates(DeviceCommand):
         buttonsData = data[0:buttonsAnswerDataBytes]
         # парсим функцией другого модуля, отвечающего за кнопки
         buttonsList = GetButtons().parseData(buttonsData)
-        print buttonsList
         result.append(buttonsList)
         dataIndex = dataIndex + buttonsAnswerDataBytes
 
