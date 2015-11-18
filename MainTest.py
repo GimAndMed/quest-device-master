@@ -70,17 +70,34 @@ def testAllSetFunction(port, address):
     command.init(port, address, lcd)
     command.execute()
 
-if __name__ == "__main__":
 
+def initSerial():
     ser = serial.Serial('/dev/pts/9',
                         timeout=1,
                         writeTimeout=0.1,
                         bytesize=serial.EIGHTBITS,
                         parity=serial.PARITY_NONE,
                         stopbits=serial.STOPBITS_ONE)
-    port = ser
-    address = 1
+    return ser
 
-    testAllGetFunction(port, address)
 
-    testAllSetFunction(port, address)
+def testResource():
+    from deviceresources.relays import Relays
+
+    relays = Relays()
+    print "Changed: ", relays.changed()
+    relays.set([0, 1, 0, 1])
+    print "Changed: ", relays.changed()
+
+if __name__ == "__main__":
+
+    # ser = initSerial()
+
+    # port = ser
+    # address = 1
+
+    # testAllGetFunction(port, address)
+
+    # testAllSetFunction(port, address)
+
+    # testResource()

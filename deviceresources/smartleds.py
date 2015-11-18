@@ -1,13 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from threading import Lock
 from copy import copy
+from resource import Resource
 
-# class LedRGB:
 
-
-class SmartLeds:
+class SmartLeds(Resource):
     """Массив умных(RGB) светодиодов
         Доступ к массиву возможен функциями get и set
         При этом доступ реализован с блокировками
@@ -24,18 +22,14 @@ class SmartLeds:
     DEFAULT_VALUE = [0x0, 0x0, 0x0]
 
     def __init__(self):
-        self.lock = Lock()
-
+        Resource.__init__(self)
         # массив с которым работает клиент
         self.rgbLeds = self.DEFAULT_VALUE * self.NUM_LEDS
 
         # массив, что уже был отправлен устройству
-        self.oldRgbLeds
+        self.oldRgbLeds = self.DEFAULT_VALUE * self.NUM_LEDS
 
-    def set(self, rgbArray):
-        # захватываем блокировку
-        self.lock.acquire()
-
+    def setResource(self, rgbArray):
         rgbArrayLen = len(rgbArray)
         rgbLedsLen = len(self.rgbLeds)
 
@@ -51,27 +45,19 @@ class SmartLeds:
             for index in range(0, lengthBarrier):
                 self.rgbLeds[index] = rgbArray[index]
 
-        # освобождаем блокировку
-        self.lock.release()
-
-    def get(self):
-        self.lock.acquire()
-
+    def getResourse(self):
         retValue = copy(self.rgbLeds)
-
-        self.lock.release()
-
         return retValue
 
     def save(self):
         """Сохраняем значение обновлённого массива
             функция используется после отправки
             команды устройству."""
-        self.lock.acquire()
+        self.block()
 
         self.oldRgbLeds = copy(self.rgbLeds)
 
-        self.lock.release()
+        self.unblock()
 
     def octetChanged(self):
         """Функция возвращает номер октета в
@@ -87,3 +73,6 @@ class SmartLeds:
         """Функция возврщает номер светодиода, который изменился,
         если он такой один"""
         pass
+
+    def changed(self):
+        return not self.equal(self.oldLeds, self.leds)
