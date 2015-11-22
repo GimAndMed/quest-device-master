@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from abc import ABCMeta, abstractmethod, abstractproperty
-from threading import Lock
+from threading import RLock
 
 
 class Resource:
@@ -13,7 +13,7 @@ class Resource:
     DEFAULT_VALUE = [0x0, 0x0, 0x0]
 
     def __init__(self):
-        self.lock = Lock()
+        self.lock = RLock()
 
     @abstractmethod
     def setResource(self, resource): pass

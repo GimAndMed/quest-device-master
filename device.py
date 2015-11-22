@@ -52,6 +52,9 @@ class Device:
             command, self.__portDescriptor, self.__address, data, self)
         command.execute()
 
+    def getName(self):
+        return self.__name
+
     def _sendSmartLeds(self): pass
 
     def _sendRelays(self): pass
