@@ -39,19 +39,13 @@ class Resource:
 
     def set(self, resource):
         # захватываем блокировку
-        self.lock.acquire()
-
-        self.setResource(resource)
-        # освобождаем блокировку
-        self.lock.release()
+        with self.lock
+            self.setResource(resource)
 
     def get(self):
-        self.lock.acquire()
-
-        resource = self.getResource()
-
-        self.lock.release()
-
+        with self.lock
+            resource = self.getResource()
+        
         return resource
 
     def block(self):

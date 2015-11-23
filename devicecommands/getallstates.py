@@ -110,8 +110,22 @@ class GetAllStates(DeviceCommand):
         """Если дескриптор слейва известен, то сохраняем данные,
         используя его интерфейс."""
         if self.slave is not None:
-            self.slave.saveButtons(data[0])
-            self.slave.saveADC(data[1])
-            self.slave.saveEncoders(data[2])
-            self.slave.saveSensor(data[3])
-            self.slave.saveStuckButtons(data[4])
+            buttons = self.slave.getButtons()
+            buttons.set(data[0])
+            # self.slave.saveButtons(data[0])
+
+            adc = self.slave.getADC()
+            adc.set(data[1])
+            # self.slave.saveADC(data[1])
+
+            encoders = self.slave.getEncoders()
+            encoders.set(data[2])
+            # self.slave.saveEncoders(data[2])
+
+            sensors = self.getSensors()
+            sensors.set(data[3])
+            # self.slave.saveSensor(data[3])
+            
+            stuckButtons = self.slave.getStuckButtons()
+            stuckButtons.set(data[4])
+            # self.slave.saveStuckButtons(data[4])

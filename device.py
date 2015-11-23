@@ -35,6 +35,23 @@ class Device:
         self.buttons = buttons.Buttons()
         self.stuckButtons = stuckbuttons.StuckButtons()
 
+    def getAdc(self):
+        return self.adc
+    def getEncoders(self):
+        return self.encoders
+    def getLcd(self):
+        return self.lcd
+    def getRelays(self):
+        return self.relays
+    def getButtons(self):
+        return self.buttons
+    def getStuckButtons(self):
+        return self.stuckButtons
+    def getSensors(self):
+        return self.sensors
+
+
+
     def executeCommands(self):
         self.sendCommand(Command.getAllStates)
 
@@ -50,11 +67,17 @@ class Device:
     def sendCommand(self, command, data=None):
         command = self.CommandFactory.createCommand(
             command, self.__portDescriptor, self.__address, data, self)
-        command.execute()
+        return command.execute()
 
     def getName(self):
         return self.__name
 
+    def sendGetAllState(self):
+        """Посылка команды получения всех состояний устройства.
+            Данные сохраняются внутри метода самой команды, посредством
+            интерфейса устройства и интерфейса ресурсов"""
+        allDeviceStates = self.sendCommand(Command.getAllStates)
+        
     def _sendSmartLeds(self): pass
 
     def _sendRelays(self): pass

@@ -3,9 +3,11 @@
 
 
 import serial
+from time import sleep
 
 from device import Device
 from devicecommands.commandcode import Command
+
 
 # Для обработки очереди команд
 import Queue
@@ -41,9 +43,9 @@ class DeviceMaster:
             1) Проверяется очередь команд, которы могут быть вызваны
             из любой части программы
             2) Выполняется основная часть взаимодействия с устройствами.
-            
-            Для каждого устройства порта выполнятся опрос всех 
-            состояний, а потом установка новых значений, если массивы 
+
+            Для каждого устройства порта выполнятся опрос всех
+            состояний, а потом установка новых значений, если массивы
             устройств изменились.
         """
         while True:
@@ -52,9 +54,9 @@ class DeviceMaster:
             slaveList = context.getSlaves()
             port = context.getPort()
             queue = context.getQueue()
-            
+
             # проверяем динамически заполняему очередь
-            if not queue.empty():             
+            if not queue.empty():
                 # если в очереди есть команды - выполняем одну
                 slave, commad, data = queue.get()
                 slave.sendCommand(commad, data)
@@ -62,12 +64,12 @@ class DeviceMaster:
             # выполняем запросы для каждого устройства
             for slave in slaveList:
                 # получение всех состояний
-                self._sendGetAllState(slave)
+                slave.executeCommands()
+                # self.sendGetAllStates(slave)
                 # посылка команд установки значений
                 # (посылаются в зависимости от того, изменилось ли
                 #   что-нибудь с прошлого опроса)
-                self._sendSetAll(slave)          
-
+                # self._sendSetAll(slave)
 
     def _initComPort(self, devComPortName):
         """Инициализация com-порта по символьному имени ser1
@@ -104,14 +106,13 @@ class DeviceMaster:
                     return slave
         return None
 
-
     def addSlave(self, name, comPort, address, boudrate=5):
         """
         При добалении нового устройства проверяется:
             1) инициализирован ли com-порт устройства.
             Если нет - идёт инициализация
             2) Создаётся устройство.
-            
+
             3) Создаётся поток, для каждого уникального порта
                 ему передаётся контекст из списка устройств с которыми
                 поток должен работать.
@@ -128,25 +129,24 @@ class DeviceMaster:
 
         # меняем скорость
         slave.sendCommand(Command.changeSpeed, boudrate)
-        time.sleep(1)
+        sleep(1)
 
-        # создаём поток для каждого уникального порта        
+        # создаём поток для каждого уникального порта
         self._createPortThread(comPortDescriptor, slave)
 
         return slave
-
 
     def _createPortThread(self, port, slave):
         """Создаение потока работы с устройствами
         Для каждого ком-порта создаётся свой поток
         И своя очередь
         """
-        
+
         # по дескриптору порта определяем существует ли для него поток
-        resourse = self._getThreadContextByPort(comPortDescriptor)
+        resourse = self._getThreadContextByPort(port)
 
         if resourse is not None:
-            # поток уже существует, добавляем в его контекст 
+            # поток уже существует, добавляем в его контекст
             # дескриптор устройства
             resourse.addSlave(slave)
             return
@@ -168,12 +168,18 @@ class DeviceMaster:
 
         return None
 
+    def sendGetAllStates(self, slave):
+        slaveDescriptor = self._getSlaveDescriptor(slave)
+        slaveDescriptor.sendCommand(Command.getAllStates)
+
+
 class ThreadContext:
     """Контекст потоков, выполняющих опрос устройств.
-    Контекст создан для эффективной передачи аргументов потокам, 
+    Контекст создан для эффективной передачи аргументов потокам,
     с возможностью динамического добавление устройств в потоки.
     """
     DEFAULT_QUEUE_SIZE = 2
+
     def __init__(self, comPort, slave, qSize=2):
         self.port = comPort
         self.slaveList = [slave]
@@ -194,7 +200,6 @@ class ThreadContext:
     def putCommand(self, slaveName, command, data=None):
         self._putCommandInQueue(slaveName, command, data)
 
-
     def _putCommandInQueue(self, slaveName, command, data=None):
         # получение дескриптора ведомого устройства
         slave = self._getSlaveDescriptor(slaveName)
@@ -206,7 +211,7 @@ class ThreadContext:
         self.queue.put(queueData)
         return True
 
-    def _getSlaveDescriptor(slaveName):
+    def _getSlaveDescriptor(self, slaveName):
         for slave in self.slaveList:
             if isinstance(slaveName, Device):
                 if slave == slaveName:
@@ -215,5 +220,3 @@ class ThreadContext:
                 if slave.getName() == slaveName:
                     return slave
         return None
-
-
