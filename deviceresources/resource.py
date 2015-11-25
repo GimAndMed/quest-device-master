@@ -39,13 +39,13 @@ class Resource:
 
     def set(self, resource):
         # захватываем блокировку
-        with self.lock
+        with self.lock:
             self.setResource(resource)
 
     def get(self):
-        with self.lock
+        with self.lock:
             resource = self.getResource()
-        
+
         return resource
 
     def block(self):
