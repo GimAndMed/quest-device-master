@@ -130,7 +130,7 @@ class SmartLeds(Resource):
         return self.rgbLeds[startIndex:startIndex + 8 * 3]
 
     def getQuartet(self, quartetIndex):
-        startIndex = (octetIndex * 4) * 3
+        startIndex = (quartetIndex * 4) * 3
         return self.rgbLeds[startIndex:startIndex + 4 * 3]
 
     def getRgbLed(self, rgbIndex):

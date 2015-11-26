@@ -101,8 +101,10 @@ class Device:
 
             """
 
-        # Определяем индексы светодиодов, которые были изменены.
-        with self.lock:
+        block = self.smartLeds.getBlock()
+        with block:
+            # Определяем индексы светодиодов, которые были изменены.
+
             changedRgbIndexList = self.smartLeds.getChangeIdexes()
 
             octetIndex = self.smartLeds.octetChanged(changedRgbIndexList)
@@ -114,25 +116,49 @@ class Device:
                 data = [octetIndex]
                 octetData = data.extend(data, self.smartLeds.getOctet(
                     octetIndex))
-                self.sendCommand(Command.setSmartOctetLeds, octetData)
+                sendStatus = self.sendCommand(
+                    Command.setSmartOctetLeds, octetData)
 
             elif quartetIndex:
                 data = [quartetIndex]
                 quartetData = data.extend(data, self.smartLeds.getQuartet(
                     quartetIndex))
-                self.sendCommand(Command.setSmartQuartetLeds, quartetData)
+                sendStatus = self.sendCommand(
+                    Command.setSmartQuartetLeds, quartetData)
 
             elif oneRgbIndex:
                 data = [oneRgbIndex]
                 oneRgbData = data.extend(data, self.smartLeds.getRgbLed(
                     oneRgbIndex))
-                self.sendCommand(Command.setSmartOneLeds, oneRgbData)
+                sendStatus = self.sendCommand(
+                    Command.setSmartOneLeds, oneRgbData)
             else:
-                self.sendCommand(Command.setSmartLeds,
-                                 self.rgbLeds.get())
+                sendStatus = self.sendCommand(Command.setSmartLeds,
+                                              self.rgbLeds.get())
+            # сохраняем отправленные на устройство значения
+            if sendStatus:
+                self.rgbLeds.save()
 
-    def sendRelays(self): pass
+    def sendRelays(self):
+        block = self.relays.getBlock()
+        with block:
+            sendStatus = self.sendCommand(
+                Command.setRelays, self.relays.get())
+            if sendStatus:
+                self.relays.save()
 
-    def sendLcd(self): pass
+    def sendLcd(self):
+        block = self.lcd.getBlock()
+        with block:
+            sendStatus = self.sendCommand(
+                Command.setLCD, self.lcd.get())
+            if sendStatus:
+                self.lcd.save()
 
-    def sendSimpleLeds(self): pass
+    def sendSimpleLeds(self):
+        block = self.simpleLeds.getBlock()
+        with block:
+            sendStatus = self.sendCommand(
+                Command.setSimpleLeds, self.simpleLeds.get())
+            if sendStatus:
+                self.simpleLeds.save()

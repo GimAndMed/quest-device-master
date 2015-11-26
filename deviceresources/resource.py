@@ -48,6 +48,9 @@ class Resource:
 
         return resource
 
+    def getBlock(self):
+        return self.lock
+
     def block(self):
         self.lock.acquire()
 

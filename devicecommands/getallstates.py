@@ -125,7 +125,7 @@ class GetAllStates(DeviceCommand):
             sensors = self.getSensors()
             sensors.set(data[3])
             # self.slave.saveSensor(data[3])
-            
+
             stuckButtons = self.slave.getStuckButtons()
             stuckButtons.set(data[4])
             # self.slave.saveStuckButtons(data[4])
