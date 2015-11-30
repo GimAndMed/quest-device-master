@@ -108,7 +108,7 @@ class DeviceCommand():
         return returnValue
 
     def send(self, package):
-        return self.portDescriptor.write(package)
+        return self.portDescriptor.write(str(bytearray(package)))
 
     def receive(self):
         return self.portDescriptor.read(self.numAnswerBytes())
@@ -139,9 +139,7 @@ class DeviceCommand():
         countCrcValue = self._countPackageCRC(answer[:-2])
 
         if (receiveCrc != countCrcValue):
-            commandLogger.info("{command}: [Error] CRC answer! Expect: {expectCRC} Receive: {recCRC}".format(command=self.__class__.__name__,
-                                                                                                             expectCRC=countCrcValue,
-                                                                                                             recCRC=receiveCrc))
+            commandLogger.info("{command}: [Error] CRC answer! Expect: {expectCRC} Receive: {recCRC}".format(command=self.__class__.__name__, expectCRC=countCrcValue,recCRC=receiveCrc))
             return False
 
         # Если слейв понял команду установки значений, то он возвращает

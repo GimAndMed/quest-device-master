@@ -77,7 +77,7 @@ class Device:
         return self.__portDescriptor
 
     def sendCommand(self, command, data=None):
-        command = self.CommandFactory.createCommand(
+        command = self.commandFactory.createCommand(
             command, self.__portDescriptor, self.__address, data, self)
         return command.execute()
 

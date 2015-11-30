@@ -1,11 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from devicecommands.commandfactory import CommandFactory
-from devicecommands.commandcode import Command
+from ..devicecommands.commandfactory import CommandFactory
+from ..devicecommands.commandcode import Command
 
 import serial
-
+from time import sleep
 
 def testAllGetFunction(port, address):
     commandFactory = CommandFactory()
@@ -91,8 +91,20 @@ def testResource():
 
 if __name__ == "__main__":
 
-    # ser = initSerial()
+    ser = initSerial()
+    port = ser
+    address = 1
+    commandFactory = CommandFactory()
 
+    # command = commandFactory.createCommand(Command.changeSpeed)
+    # command.init(port, address, 4)
+    # command.execute()
+    # sleep(5)
+    lcd = "hay Michael"
+    command = commandFactory.createCommand(Command.setLCD)
+    command.init(port, address, lcd)
+    command.execute()
+    sleep(2)
     # port = ser
     # address = 1
 

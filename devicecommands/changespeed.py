@@ -43,7 +43,7 @@ class ChangeSpeed(DeviceCommand):
 
     # переопределяем функцию отправки, для смены скорости
     def send(self, package):
-        numBytesSend = self.portDescriptor.write(package)
+        numBytesSend = self.portDescriptor.write(str(bytearray(package)))
 
         self._setNewSpeed()
 
