@@ -19,7 +19,7 @@ class Resource:
     def setResource(self, resource): pass
 
     @abstractmethod
-    def getResourse(self): pass
+    def getResource(self): pass
 
     @abstractmethod
     def changed(self):

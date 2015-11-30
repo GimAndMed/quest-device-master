@@ -20,6 +20,7 @@ class Relays(Resource):
 
     def __init__(self):
         Resource.__init__(self)
+        # super(Resource, self).__init__()
         # массив с которым работает клиент
         self.relays = self.DEFAULT_VALUE * self.NUM_RELAYS
 
@@ -33,8 +34,8 @@ class Relays(Resource):
         else:
             self.relays = relays[0: self.NUM_RELAYS]
 
-    def getResourse(self):
-        retValue = copy(self.leds)
+    def getResource(self):
+        retValue = copy(self.relays)
         return retValue
 
     def save(self):
