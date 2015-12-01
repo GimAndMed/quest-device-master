@@ -157,7 +157,7 @@ class DeviceMaster:
             # создаём поток
             portThread = threading.Thread(
                 target=self._portThreadHandler,
-                args=(threadContext))
+                args=(threadContext,))
             portThread.daemon = True
             portThread.start()
 

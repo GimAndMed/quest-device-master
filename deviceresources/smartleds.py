@@ -123,7 +123,7 @@ class SmartLeds(Resource):
         return False
 
     def changed(self):
-        return not self.equal(self.oldLeds, self.leds)
+        return not self.equal(self.oldRgbLeds, self.rgbLeds)
 
     def getOctet(self, octetIndex):
         startIndex = (octetIndex * 8) * 3

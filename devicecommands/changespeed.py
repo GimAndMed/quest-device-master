@@ -54,15 +54,22 @@ class ChangeSpeed(DeviceCommand):
         if speedID < 0 or speedID >= len(self.baudrateList):
             print "Speed do not changed - wrong speedID: ", speedID
             return
+
+        oldBaudrate = self.portDescriptor.baudrate
+        print "oldBaudrate: ", oldBaudrate, " New baudrate: ", self.baudrateList[speedID], " speedID: ", speedID
+        if oldBaudrate == self.baudrateList[speedID]:
+            print "New speed is equal to old; do not change speed"
+            return
+
         self.portDescriptor.flush()
         sleep(1)
-        oldBaudrate = self.portDescriptor.baudrate
+
         self.portDescriptor.baudrate = self.baudrateList[speedID]
         self.portDescriptor.close()
         sleep(1)
         self.portDescriptor.open()
         print "Speed changed from {0} to {1}: ".format(
-            self.baudrateList[speedID], oldBaudrate)
+            oldBaudrate, self.baudrateList[speedID])
         sleep(1)
 
     def parseData(self, data):

@@ -28,7 +28,7 @@ class Device:
         self.adc = adc.Adc()
         self.encoders = encoders.Encoders()
         self.lcd = lcd.Lcd()
-        self.relays = relays.Relays
+        self.relays = relays.Relays()
         self.sensors = sensors.Sensors()
         self.simpLeds = simpleleds.SimpleLeds()
         self.smartLeds = smartleds.SmartLeds()
@@ -48,6 +48,8 @@ class Device:
 
     def getRelays(self):
         return self.relays
+    def setRelays(self, value):
+        self.relays.set(value)
 
     def getButtons(self):
         return self.buttons
@@ -62,13 +64,13 @@ class Device:
         self.sendCommand(Command.getAllStates)
 
         if self.smartLeds.changed():
-            self._sendSmartLeds()
+            self.sendSmartLeds()
         if self.relays.changed():
-            self._sendRelays()
+            self.sendRelays()
         if self.lcd.changed():
-            self._sendLcd()
+            self.sendLcd()
         if self.simpLeds.changed():
-            self._sendSimpleLeds()
+            self.sendSimpleLeds()
 
     def getName(self):
         return self.__name
