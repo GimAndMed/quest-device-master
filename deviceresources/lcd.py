@@ -29,12 +29,12 @@ class Lcd(Resource):
     def setResource(self, lcd):
 
         if len(lcd) < self.NUM_ELEMENTS:
-            self.lcd = lcd + [0] * (self.NUM_ELEMENTS - len(lcd))
+            self.lcd = lcd + ' ' * (self.NUM_ELEMENTS - len(lcd))
         else:
             self.lcd = lcd[0: self.NUM_ELEMENTS]
 
-    def getResourse(self):
-        retValue = copy(self.leds)
+    def getResource(self):
+        retValue = copy(self.lcd)
         return retValue
 
     def save(self):

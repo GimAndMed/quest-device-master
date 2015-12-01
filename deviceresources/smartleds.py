@@ -48,7 +48,7 @@ class SmartLeds(Resource):
             for index in range(0, lengthBarrier):
                 self.rgbLeds[index] = rgbArray[index]
 
-    def getResourse(self):
+    def getResource(self):
         retValue = copy(self.rgbLeds)
         return retValue
 

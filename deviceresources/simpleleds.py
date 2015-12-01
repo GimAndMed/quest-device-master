@@ -31,18 +31,18 @@ class SimpleLeds(Resource):
         ledsLen = len(self.leds)
 
         # копируем
-        if arrayLen == ledsLen:
-            self.rgbLeds = copy(ledsArray)
+        # if arrayLen == ledsLen:
+        #     self.rgbLeds = copy(ledsArray)
+        # else:
+        if arrayLen >= ledsLen:
+            lengthBarrier = ledsLen
         else:
-            if arrayLen > ledsLen:
-                lengthBarrier = ledsLen
-            else:
-                lengthBarrier = arrayLen
+            lengthBarrier = arrayLen
 
-            for index in range(0, lengthBarrier):
-                self.leds[index] = ledsArray[index]
+        for index in range(0, lengthBarrier):
+            self.leds[index] = ledsArray[index]
 
-    def getResourse(self):
+    def getResource(self):
         retValue = copy(self.leds)
         return retValue
 

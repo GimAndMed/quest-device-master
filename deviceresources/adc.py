@@ -25,12 +25,11 @@ class Adc(Resource):
 
     def setResource(self, adc):
         if len(adc) < self.NUM_ELEMENTS:
-            self.adc = adc + [0] * \
-                                        self.NUM_ELEMENTS - len(adc)
+            self.adc = adc + [0] * (self.NUM_ELEMENTS - len(adc))
         else:
             self.adc = adc[0: self.NUM_ELEMENTS]
 
-    def getResourse(self):
+    def getResource(self):
         retValue = copy(self.adc)
         return retValue
 

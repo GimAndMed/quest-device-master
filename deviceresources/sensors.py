@@ -30,7 +30,7 @@ class Sensors(Resource):
         else:
             self.elements = elements[0: self.NUM_ELEMENTS]
 
-    def getResourse(self):
+    def getResource(self):
         retValue = copy(self.elements)
         return retValue
 

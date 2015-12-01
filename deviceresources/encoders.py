@@ -30,7 +30,7 @@ class Encoders(Resource):
         else:
             self.encoders = encoders[0: self.NUM_ELEMENTS]
 
-    def getResourse(self):
+    def getResource(self):
         retValue = copy(self.encoders)
         return retValue
 

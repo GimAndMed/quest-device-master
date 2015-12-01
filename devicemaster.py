@@ -63,7 +63,7 @@ class DeviceMaster:
 
             # выполняем запросы для каждого устройства
             for slave in slaveList:
-                # получение всех состояний
+                # команды выполняемые устройством в классе device.py
                 slave.executeCommands()
                 # self.sendGetAllStates(slave)
                 # посылка команд установки значений

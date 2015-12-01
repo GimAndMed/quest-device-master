@@ -30,7 +30,7 @@ class StuckButtons(Resource):
         else:
             self.buttons = buttons[0: self.NUM_ELEMENTS]
 
-    def getResourse(self):
+    def getResource(self):
         retValue = copy(self.buttons)
         return retValue
 

@@ -15,7 +15,7 @@ if __name__ == "__main__":
 
     while True:
         relays = slave.getRelays()
-        print relays.get(relays)
+        print relays.relays
         # relays.set([1,0,0,1])
         # slave.setRelays([1, 0, 0, 1])
         sleep(5)
