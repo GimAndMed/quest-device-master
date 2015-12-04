@@ -43,26 +43,53 @@ class Device:
     def getEncoders(self):
         return self.encoders
 
+    # ЖКИ
     def getLcd(self):
         return self.lcd
 
+    def setLcd(self, value):
+        self.lcd.set(value)
+
+    # Реле
     def getRelays(self):
         return self.relays
+
     def setRelays(self, value):
         self.relays.set(value)
 
+    # Кнопки
     def getButtons(self):
         return self.buttons
 
     def getStuckButtons(self):
         return self.stuckButtons
 
+    # Сенсорные кнопки
     def getSensors(self):
         return self.sensors
 
+    # Умные светодиоды
+    def getSmartLeds(self):
+        return self.smartLeds
+
+    def setSmartLeds(set, value):
+        self.smartLeds.set(value)
+
+
+    # Простые светодиоды
+    def getSimpleLeds(self):
+        return self.simpleLeds
+
+    def setSimpleLeds(self, value):
+        self.simpLeds.set(value)
+
     def executeCommands(self):
+        """Функции устройства, выполняемые в потоке
+        """
+        # Получение состояния всех устройств
         self.sendCommand(Command.getAllStates)
 
+        # Посылка команд установки значений
         if self.smartLeds.changed():
             self.sendSmartLeds()
         if self.relays.changed():
@@ -79,8 +106,9 @@ class Device:
         return self.__portDescriptor
 
     def sendCommand(self, command, data=None):
+        slave = self
         command = self.commandFactory.createCommand(
-            command, self.__portDescriptor, self.__address, data, self)
+            command, self.__portDescriptor, self.__address, data, slave)
         return command.execute()
 
     def sendGetAllState(self):

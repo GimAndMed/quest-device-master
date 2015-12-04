@@ -44,3 +44,9 @@ class Adc(Resource):
 
     def changed(self):
         return not self.equal(self.oldAdc, self.adc)
+
+    def printResource(slave):
+        print("ADC value: \n")
+        for index, value in enumerate(self.adc):
+            print("[{index}]: {value} ".format(index=index, value=value))
+        print("\n")

@@ -45,3 +45,12 @@ class Buttons(Resource):
 
     def changed(self):
         return not self.equal(self.oldButtons, self.buttons)
+
+    def printResource(self):
+        print("Buttons: \n")
+        for index, value in enumerate(self.buttons):
+            if (index % 2) == 0:
+                print("\t")
+            else
+                print("\n")
+            print("[{index}]: {value} ".format(index=index, value=value))

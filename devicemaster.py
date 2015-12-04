@@ -35,6 +35,68 @@ class DeviceMaster:
         # список созданных потоков
         self.threadList = []
 
+
+    def _createPortThread(self, port, slave):
+        """Создаение потока работы с устройствами
+        Для каждого ком-порта создаётся свой поток
+        И своя очередь
+        """
+
+        # по дескриптору порта определяем существует ли для него поток
+        resourse = self._getThreadContextByPort(port)
+
+        if resourse is not None:
+            # поток уже существует, добавляем в его контекст
+            # дескриптор устройства
+            resourse.addSlave(slave)
+            return
+        else:
+            # создаём контекст
+            threadContext = ThreadContext(port, slave)
+            self.threadContextList.append(threadContext)
+            # создаём поток
+            portThread = threading.Thread(
+                target=self._portThreadHandler,
+                args=(threadContext,))
+
+            # сохраняем дескриптор в списке
+            self.threadList.append(portThread)
+
+            # запускаем
+            portThread.daemon = True
+            portThread.start()
+
+    def _initComPort(self, devComPortName):
+        """Инициализация com-порта по символьному имени ser1
+        или пути /dev/ser1.
+        Возвращается дескриптор порта
+        Исключения не обрабатываются.
+        """
+        # if comPort exist in list then return it
+        for comPort in self.__comPortList:
+            if comPort.name == devComPortName:
+                return comPort
+
+        # ComPort not exist in List ->
+        #    then Open port, add in List and return
+        serialDescriptor = serial.Serial(
+            devComPortName, self.DEFAULT_BAUDRATE,
+            timeout=self.COM_READ_TIMEOUT,
+            writeTimeout=self.COM_WRITE_TIMEOUT,
+            bytesize=serial.EIGHTBITS,
+            parity=serial.PARITY_NONE,
+            stopbits=serial.STOPBITS_ONE)
+
+        self.__comPortList.append(serialDescriptor)
+        return serialDescriptor
+
+    def _getThreadContextByPort(self, port):
+        for resourse in self.threadContextList:
+            if port == resourse.getPort():
+                return resourse
+
+        return None
+
     def _portThreadHandler(self, context):
         """ Поток взаимодействия с устройством.
             Для каждого порта создаётся свой.
@@ -65,35 +127,8 @@ class DeviceMaster:
             for slave in slaveList:
                 # команды выполняемые устройством в классе device.py
                 slave.executeCommands()
-                # self.sendGetAllStates(slave)
-                # посылка команд установки значений
-                # (посылаются в зависимости от того, изменилось ли
-                #   что-нибудь с прошлого опроса)
-                # self._sendSetAll(slave)
 
-    def _initComPort(self, devComPortName):
-        """Инициализация com-порта по символьному имени ser1
-        или пути /dev/ser1.
-        Возвращается дескриптор порта
-        Исключения не обрабатываются.
-        """
-        # if comPort exist in list then return it
-        for comPort in self.__comPortList:
-            if comPort.name == devComPortName:
-                return comPort
 
-        # ComPort not exist in List ->
-        #    then Open port, add in List and return
-        serialDescriptor = serial.Serial(
-            devComPortName, self.DEFAULT_BAUDRATE,
-            timeout=self.COM_READ_TIMEOUT,
-            writeTimeout=self.COM_WRITE_TIMEOUT,
-            bytesize=serial.EIGHTBITS,
-            parity=serial.PARITY_NONE,
-            stopbits=serial.STOPBITS_ONE)
-
-        self.__comPortList.append(serialDescriptor)
-        return serialDescriptor
 
     def _getSlaveDescriptor(self, slaveName):
         """Получение дескриптора устройства по имени"""
@@ -136,41 +171,112 @@ class DeviceMaster:
 
         return slave
 
-    def _createPortThread(self, port, slave):
-        """Создаение потока работы с устройствами
-        Для каждого ком-порта создаётся свой поток
-        И своя очередь
-        """
+    # Ещё не решил как удобнее получать ресурсы устройств.
+    # Самостоятельными объектами, или просто массивами
+    # Если получать просто массивами, то для записи новых значений нужно использовать функции set* мастера
+    # Если получать объектами, запись в них нужно осуществлять
+    # их же фунцкиями set.
+    # Также в объектах храяняться их предыущие значения.
+    VALUE_CLASS_OBJECT="object"
+    VALUE_CLASS_VALUE="value"
+    VALUE_CLASS_DEFAULT_VALUE=VALUE_CLASS_OBJECT
 
-        # по дескриптору порта определяем существует ли для него поток
-        resourse = self._getThreadContextByPort(port)
-
-        if resourse is not None:
-            # поток уже существует, добавляем в его контекст
-            # дескриптор устройства
-            resourse.addSlave(slave)
+    # АЦП
+    def getAdc(self, slave, valueClass=VALUE_CLASS_DEFAULT_VALUE):
+        slaveDescriptor = self._getSlaveDescriptor(slave):
+        if not slaveDescriptor:
             return
-        else:
-            # создаём контекст
-            threadContext = ThreadContext(port, slave)
-            self.threadContextList.append(threadContext)
-            # создаём поток
-            portThread = threading.Thread(
-                target=self._portThreadHandler,
-                args=(threadContext,))
-            portThread.daemon = True
-            portThread.start()
+        if valueClass == VALUE_CLASS_OBJECT:
+            return slaveDescriptor.getAdc()
+        return slaveDescriptor.getAdc().get()
 
-    def _getThreadContextByPort(self, port):
-        for resourse in self.threadContextList:
-            if port == resourse.getPort():
-                return resourse
-
-        return None
-
-    def sendGetAllStates(self, slave):
+    # Кнопки
+    def getButtons(self, slave, valueClass=VALUE_CLASS_DEFAULT_VALUE):
         slaveDescriptor = self._getSlaveDescriptor(slave)
-        slaveDescriptor.sendCommand(Command.getAllStates)
+        if not slaveDescriptor:
+            return
+        if valueClass == VALUE_CLASS_OBJECT:
+            slaveDescriptor.getButtons()
+        slaveDescriptor.getButtons().get
+
+    # 'Залипшие' кнопки
+    def getStuckButtons(self, slave, valueClass=VALUE_CLASS_DEFAULT_VALUE):
+        slaveDescriptor = self._getSlaveDescriptor(slave)
+        if not slaveDescriptor:
+            return
+        if valueClass == VALUE_CLASS_OBJECT:
+            slaveDescriptor.getStuckButtons()
+        slaveDescriptor.getStuckButtons().get()
+
+    # Энкодеры
+    def getEncoders(self, slave, valueClass=VALUE_CLASS_DEFAULT_VALUE):
+        slaveDescriptor = self._getSlaveDescriptor(slave)
+        if not slaveDescriptor:
+            return
+        if valueClass == VALUE_CLASS_OBJECT:
+            return slaveDescriptor.getEncoders()
+        return slaveDescriptor.getEncoders().get()
+
+    # ЖКИ
+    def getLcd(self, slave, valueClass=VALUE_CLASS_DEFAULT_VALUE):
+        slaveDescriptor = self._getSlaveDescriptor(slave)
+        if not slaveDescriptor:
+            return
+        if valueClass == VALUE_CLASS_OBJECT:
+            return slaveDescriptor.getLcd()
+        return slaveDescriptor.getLcd().get()
+
+    def setLcd(self, slave):
+        slaveDescriptor = self._getSlaveDescriptor(slave)
+        if not slaveDescriptor:
+            return
+        slaveDescriptor.setLcd(value)
+
+    # Реле
+    def getRelays(self, slave, valueClass=VALUE_CLASS_DEFAULT_VALUE):
+        slaveDescriptor = self._getSlaveDescriptor(slave)
+        if not slaveDescriptor:
+            return
+        if valueClass == VALUE_CLASS_OBJECT:
+            return slaveDescriptor.getRelays()
+        return slaveDescriptor.getRelays().get()
+
+    def setRelays(self, slave, valueClass=VALUE_CLASS_DEFAULT_VALUE):
+        slaveDescriptor = self._getSlaveDescriptor(slave)
+        if not slaveDescriptor:
+            return
+        return slaveDescriptor.setRelays(value)
+
+    # Обычные светодиоды
+    def getSimpleLeds(self, slave, valueClass=VALUE_CLASS_DEFAULT_VALUE):
+        slaveDescriptor = self._getSlaveDescriptor(slave)
+        if not slaveDescriptor:
+            return
+        if valueClass == VALUE_CLASS_OBJECT:
+            return slaveDescriptor.getSimpleLeds()
+        return slaveDescriptor.getSimpleLeds.get()
+
+    def setSimpleLeds(self, slave, valueClass=VALUE_CLASS_DEFAULT_VALUE):
+        slaveDescriptor = self._getSlaveDescriptor(slave)
+        if not slaveDescriptor:
+            return
+        slaveDescriptor.setSimpleLeds(value)
+
+    # Умные светодиоды
+    def getSmartLeds(self, slave, valueClass=VALUE_CLASS_DEFAULT_VALUE):
+        slaveDescriptor = self._getSlaveDescriptor(slave)
+        if not slaveDescriptor:
+            return
+        if valueClass == VALUE_CLASS_OBJECT:
+            return slaveDescriptor.getSmartLeds()
+        else:
+            return slaveDescriptor.getSmartLeds().get()
+
+    def setSmartLeds(self, slave, value):
+        slaveDescriptor = self._getSlaveDescriptor(slave)
+        if not slave:
+            return
+        slaveDescriptor.setSmartLeds(value)
 
 
 class ThreadContext:
