@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from copy import copy
-from resource import Resource
+from .resource import Resource
 
 
 class Buttons(Resource):
@@ -26,9 +26,10 @@ class Buttons(Resource):
     def setResource(self, buttons):
         if len(buttons) < self.NUM_ELEMENTS:
             self.buttons = buttons + [0] * \
-                                        self.NUM_ELEMENTS - len(buttons)
+                self.NUM_ELEMENTS - len(buttons)
         else:
             self.buttons = buttons[0: self.NUM_ELEMENTS]
+            # print(self.buttons)
 
     def getResource(self):
         retValue = copy(self.buttons)
@@ -47,10 +48,21 @@ class Buttons(Resource):
         return not self.equal(self.oldButtons, self.buttons)
 
     def printResource(self):
-        print("Buttons: \n")
-        for index, value in enumerate(self.buttons):
-            if (index % 2) == 0:
-                print("\t")
-            else
-                print("\n")
-            print("[{index}]: {value} ".format(index=index, value=value))
+        print("Buttons: ")
+
+        # index = 0
+        halfLen = len(self.buttons) / 2
+        for index in range(halfLen):
+            print("[{index_1}]: {value_1}\t[{index_2}]: {value_2}".format(
+                index_1=index,
+                value_1=self.buttons[index],
+                index_2=index + halfLen,
+                value_2=self.buttons[index + halfLen]))
+
+        # for index, value in enumerate(self.buttons):
+        #     if (index % 2) == 0:
+        #         print("\n"),
+        #     else:
+        #         print("\t"),
+        #     print("[{index}]: {value} ".format(index=index, value=value)),
+        # print

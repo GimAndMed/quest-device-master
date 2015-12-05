@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from devicecommand import DeviceCommand
-from commandcode import Command
+from .devicecommand import DeviceCommand
+from .commandcode import Command
 from time import sleep
 
 
@@ -52,13 +52,14 @@ class ChangeSpeed(DeviceCommand):
     def _setNewSpeed(self):
         speedID = self.data
         if speedID < 0 or speedID >= len(self.baudrateList):
-            print "Speed do not changed - wrong speedID: ", speedID
+            print("Speed do not changed - wrong speedID: ", speedID)
             return
 
         oldBaudrate = self.portDescriptor.baudrate
-        print "oldBaudrate: ", oldBaudrate, " New baudrate: ", self.baudrateList[speedID], " speedID: ", speedID
+        print("oldBaudrate: ", oldBaudrate, " New baudrate: ",
+              self.baudrateList[speedID], " speedID: ", speedID)
         if oldBaudrate == self.baudrateList[speedID]:
-            print "New speed is equal to old; do not change speed"
+            print("New speed is equal to old; do not change speed")
             return
 
         self.portDescriptor.flush()
@@ -68,8 +69,8 @@ class ChangeSpeed(DeviceCommand):
         self.portDescriptor.close()
         sleep(1)
         self.portDescriptor.open()
-        print "Speed changed from {0} to {1}: ".format(
-            oldBaudrate, self.baudrateList[speedID])
+        print("Speed changed from {0} to {1}: ".format(
+            oldBaudrate, self.baudrateList[speedID]))
         sleep(1)
 
     def parseData(self, data):

@@ -3,16 +3,17 @@
 
 # Импортируем ресурсы - объекты, содержащие данные платы
 # соответствующего типа.
-from deviceresources import adc, encoders, lcd
-from deviceresources import relays, sensors, simpleleds, smartleds
-from deviceresources import buttons, stuckbuttons
+from .deviceresources import adc, encoders, lcd
+from .deviceresources import relays, sensors, simpleleds, smartleds
+from .deviceresources import buttons, stuckbuttons
 
 # Импортируем фабрику команд
-from devicecommands.commandfactory import CommandFactory
-from devicecommands.commandcode import Command
+from .devicecommands.commandfactory import CommandFactory
+from .devicecommands.commandcode import Command
 
 
 class Device:
+
     """Устройство. Предоставляет доступ к данным подключённой платы.
     """
 
@@ -30,7 +31,7 @@ class Device:
         self.lcd = lcd.Lcd()
         self.relays = relays.Relays()
         self.sensors = sensors.Sensors()
-        self.simpLeds = simpleleds.SimpleLeds()
+        self.simpleLeds = simpleleds.SimpleLeds()
         self.smartLeds = smartleds.SmartLeds()
         self.buttons = buttons.Buttons()
         self.stuckButtons = stuckbuttons.StuckButtons()
@@ -72,16 +73,15 @@ class Device:
     def getSmartLeds(self):
         return self.smartLeds
 
-    def setSmartLeds(set, value):
+    def setSmartLeds(self, value):
         self.smartLeds.set(value)
-
 
     # Простые светодиоды
     def getSimpleLeds(self):
         return self.simpleLeds
 
     def setSimpleLeds(self, value):
-        self.simpLeds.set(value)
+        self.simpleLeds.set(value)
 
     def executeCommands(self):
         """Функции устройства, выполняемые в потоке
@@ -96,7 +96,7 @@ class Device:
             self.sendRelays()
         if self.lcd.changed():
             self.sendLcd()
-        if self.simpLeds.changed():
+        if self.simpleLeds.changed():
             self.sendSimpleLeds()
 
     def getName(self):
@@ -142,32 +142,38 @@ class Device:
                 changedRgbIndexList)
             oneRgbIndex = self.smartLeds.oneChanged(changedRgbIndexList)
 
-            if octetIndex:
-                data = [octetIndex]
-                octetData = data.extend(data, self.smartLeds.getOctet(
-                    octetIndex))
+            if oneRgbIndex is not None:
+                print("OneLedChanged")
+                oneRgbData = [oneRgbIndex]
+                oneRgbData.extend(self.smartLeds.getRgbLed(
+                    oneRgbIndex))
                 sendStatus = self.sendCommand(
-                    Command.setSmartOctetLeds, octetData)
+                    Command.setSmartOneLeds, oneRgbData)
 
-            elif quartetIndex:
-                data = [quartetIndex]
-                quartetData = data.extend(data, self.smartLeds.getQuartet(
+            elif quartetIndex is not None:
+                print("Quartetchanged")
+                quartetData = [quartetIndex]
+                quartetData.extend(self.smartLeds.getQuartet(
                     quartetIndex))
                 sendStatus = self.sendCommand(
                     Command.setSmartQuartetLeds, quartetData)
 
-            elif oneRgbIndex:
-                data = [oneRgbIndex]
-                oneRgbData = data.extend(data, self.smartLeds.getRgbLed(
-                    oneRgbIndex))
+            elif octetIndex is not None:
+                print("OctetChanged, index:", octetIndex)
+                octetData = [octetIndex]
+                octetData.extend(self.smartLeds.getOctet(
+                    octetIndex))
                 sendStatus = self.sendCommand(
-                    Command.setSmartOneLeds, oneRgbData)
+                    Command.setSmartOctetLeds, octetData)
+
             else:
+                print("AllChanged")
                 sendStatus = self.sendCommand(Command.setSmartLeds,
-                                              self.rgbLeds.get())
+                                              self.smartLeds.get())
             # сохраняем отправленные на устройство значения
             if sendStatus:
-                self.rgbLeds.save()
+                print("SendSatatus OK")
+                self.smartLeds.save()
 
     def sendRelays(self):
         block = self.relays.getBlock()

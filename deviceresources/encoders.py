@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from copy import copy
-from resource import Resource
+from .resource import Resource
 
 
 class Encoders(Resource):
@@ -26,7 +26,7 @@ class Encoders(Resource):
     def setResource(self, encoders):
         if len(encoders) < self.NUM_ELEMENTS:
             self.encoders = encoders + [0] * \
-                                        self.NUM_ELEMENTS - len(encoders)
+                                        (self.NUM_ELEMENTS - len(encoders))
         else:
             self.encoders = encoders[0: self.NUM_ELEMENTS]
 

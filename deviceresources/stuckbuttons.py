@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from copy import copy
-from resource import Resource
+from .resource import Resource
 
 
 class StuckButtons(Resource):
@@ -45,3 +45,15 @@ class StuckButtons(Resource):
 
     def changed(self):
         return not self.equal(self.oldButtons, self.buttons)
+
+    def printResource(self):
+        print("StuckButtons: ")
+        # index = 0
+        halfLen = len(self.buttons) / 2
+        for index in range(halfLen):
+            print("[{index_1}]: {value_1}\t[{index_2}]: {value_2}".format(
+                index_1=index,
+                value_1=self.buttons[index],
+                index_2=index + halfLen,
+                value_2=self.buttons[index + halfLen]))
+

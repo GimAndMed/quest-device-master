@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from copy import copy
-from resource import Resource
+from .resource import Resource
 
 
 class Relays(Resource):

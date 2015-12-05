@@ -5,12 +5,15 @@
 import serial
 from time import sleep
 
-from device import Device
-from devicecommands.commandcode import Command
+from .device import Device
+from .devicecommands.commandcode import Command
 
 
 # Для обработки очереди команд
-import Queue
+try:
+    import Queue
+except:
+    import queue as Queue
 import threading
 
 
@@ -34,7 +37,6 @@ class DeviceMaster:
 
         # список созданных потоков
         self.threadList = []
-
 
     def _createPortThread(self, port, slave):
         """Создаение потока работы с устройствами
@@ -128,8 +130,6 @@ class DeviceMaster:
                 # команды выполняемые устройством в классе device.py
                 slave.executeCommands()
 
-
-
     def _getSlaveDescriptor(self, slaveName):
         """Получение дескриптора устройства по имени"""
         for slave in self.__slaveList:
@@ -177,16 +177,16 @@ class DeviceMaster:
     # Если получать объектами, запись в них нужно осуществлять
     # их же фунцкиями set.
     # Также в объектах храяняться их предыущие значения.
-    VALUE_CLASS_OBJECT="object"
-    VALUE_CLASS_VALUE="value"
-    VALUE_CLASS_DEFAULT_VALUE=VALUE_CLASS_OBJECT
+    VALUE_CLASS_OBJECT = "object"
+    VALUE_CLASS_VALUE = "value"
+    VALUE_CLASS_DEFAULT_VALUE = VALUE_CLASS_OBJECT
 
     # АЦП
     def getAdc(self, slave, valueClass=VALUE_CLASS_DEFAULT_VALUE):
-        slaveDescriptor = self._getSlaveDescriptor(slave):
+        slaveDescriptor = self._getSlaveDescriptor(slave)
         if not slaveDescriptor:
             return
-        if valueClass == VALUE_CLASS_OBJECT:
+        if valueClass == self.VALUE_CLASS_OBJECT:
             return slaveDescriptor.getAdc()
         return slaveDescriptor.getAdc().get()
 
@@ -195,25 +195,25 @@ class DeviceMaster:
         slaveDescriptor = self._getSlaveDescriptor(slave)
         if not slaveDescriptor:
             return
-        if valueClass == VALUE_CLASS_OBJECT:
-            slaveDescriptor.getButtons()
-        slaveDescriptor.getButtons().get
+        if valueClass == self.VALUE_CLASS_OBJECT:
+            return slaveDescriptor.getButtons()
+        return slaveDescriptor.getButtons().get()
 
     # 'Залипшие' кнопки
     def getStuckButtons(self, slave, valueClass=VALUE_CLASS_DEFAULT_VALUE):
         slaveDescriptor = self._getSlaveDescriptor(slave)
         if not slaveDescriptor:
             return
-        if valueClass == VALUE_CLASS_OBJECT:
-            slaveDescriptor.getStuckButtons()
-        slaveDescriptor.getStuckButtons().get()
+        if valueClass == self.VALUE_CLASS_OBJECT:
+            return slaveDescriptor.getStuckButtons()
+        return slaveDescriptor.getStuckButtons().get()
 
     # Энкодеры
     def getEncoders(self, slave, valueClass=VALUE_CLASS_DEFAULT_VALUE):
         slaveDescriptor = self._getSlaveDescriptor(slave)
         if not slaveDescriptor:
             return
-        if valueClass == VALUE_CLASS_OBJECT:
+        if valueClass == self.VALUE_CLASS_OBJECT:
             return slaveDescriptor.getEncoders()
         return slaveDescriptor.getEncoders().get()
 
@@ -222,7 +222,7 @@ class DeviceMaster:
         slaveDescriptor = self._getSlaveDescriptor(slave)
         if not slaveDescriptor:
             return
-        if valueClass == VALUE_CLASS_OBJECT:
+        if valueClass == self.VALUE_CLASS_OBJECT:
             return slaveDescriptor.getLcd()
         return slaveDescriptor.getLcd().get()
 
@@ -237,26 +237,26 @@ class DeviceMaster:
         slaveDescriptor = self._getSlaveDescriptor(slave)
         if not slaveDescriptor:
             return
-        if valueClass == VALUE_CLASS_OBJECT:
+        if valueClass == self.VALUE_CLASS_OBJECT:
             return slaveDescriptor.getRelays()
         return slaveDescriptor.getRelays().get()
 
-    def setRelays(self, slave, valueClass=VALUE_CLASS_DEFAULT_VALUE):
+    def setRelays(self, slave, value):
         slaveDescriptor = self._getSlaveDescriptor(slave)
         if not slaveDescriptor:
             return
-        return slaveDescriptor.setRelays(value)
+        slaveDescriptor.setRelays(value)
 
     # Обычные светодиоды
     def getSimpleLeds(self, slave, valueClass=VALUE_CLASS_DEFAULT_VALUE):
         slaveDescriptor = self._getSlaveDescriptor(slave)
         if not slaveDescriptor:
             return
-        if valueClass == VALUE_CLASS_OBJECT:
+        if valueClass == self.VALUE_CLASS_OBJECT:
             return slaveDescriptor.getSimpleLeds()
         return slaveDescriptor.getSimpleLeds.get()
 
-    def setSimpleLeds(self, slave, valueClass=VALUE_CLASS_DEFAULT_VALUE):
+    def setSimpleLeds(self, slave, value):
         slaveDescriptor = self._getSlaveDescriptor(slave)
         if not slaveDescriptor:
             return
@@ -267,7 +267,7 @@ class DeviceMaster:
         slaveDescriptor = self._getSlaveDescriptor(slave)
         if not slaveDescriptor:
             return
-        if valueClass == VALUE_CLASS_OBJECT:
+        if valueClass == self.VALUE_CLASS_OBJECT:
             return slaveDescriptor.getSmartLeds()
         else:
             return slaveDescriptor.getSmartLeds().get()
@@ -277,6 +277,15 @@ class DeviceMaster:
         if not slave:
             return
         slaveDescriptor.setSmartLeds(value)
+
+    def getSensors(self, slave, valueClass=VALUE_CLASS_DEFAULT_VALUE):
+        slaveDescriptor = self._getSlaveDescriptor(slave)
+        if not slaveDescriptor:
+            return
+        if valueClass == self.VALUE_CLASS_OBJECT:
+            return slaveDescriptor.getSensors()
+        else:
+            return slaveDescriptor.getSensors().get()
 
 
 class ThreadContext:

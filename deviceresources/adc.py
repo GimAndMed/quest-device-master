@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from copy import copy
-from resource import Resource
+from .resource import Resource
 
 
 class Adc(Resource):
@@ -45,8 +45,8 @@ class Adc(Resource):
     def changed(self):
         return not self.equal(self.oldAdc, self.adc)
 
-    def printResource(slave):
+    def printResource(self):
         print("ADC value: \n")
         for index, value in enumerate(self.adc):
-            print("[{index}]: {value} ".format(index=index, value=value))
-        print("\n")
+            print("[{index}]: {value} ".format(index=index, value=value)),
+        print

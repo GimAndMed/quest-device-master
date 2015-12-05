@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from abc import ABCMeta, abstractmethod, abstractproperty
-from commandcode import Command, commandTypeIsGet, commandTypeIsSet
+from .commandcode import Command, commandTypeIsGet, commandTypeIsSet
 import logging
 
 # для отладочного вывода
@@ -10,8 +10,8 @@ logging.basicConfig(
     format=u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s%(message)s',
     level=logging.DEBUG)
 commandLogger = logging.getLogger('package')
-# logging.disable(logging.DEBUG)
-logging.disable(logging.NOTSET)
+logging.disable(logging.DEBUG)
+# logging.disable(logging.NOTSET)
 
 
 class DeviceCommand():
@@ -108,7 +108,8 @@ class DeviceCommand():
         return returnValue
 
     def send(self, package):
-        return self.portDescriptor.write(str(bytearray(package)))
+        # return self.portDescriptor.write(str(bytearray(package)))
+        return self.portDescriptor.write(package)
 
     def receive(self):
         return self.portDescriptor.read(self.numAnswerBytes())
@@ -128,9 +129,15 @@ class DeviceCommand():
             return False
 
         # получателем должен быть мастер 0x80
-        if 0x80 != ord(answer[0]):
+        startByte = answer[0]
+        if isinstance(answer[0], int):
+            startByte = answer[0]
+        else:
+            startByte = ord(answer[0])
+
+        if 0x80 != startByte:
             commandLogger.info("{command}: [Error] Answer startByte not for us! 0x80 = {startB}".format(
-                command=self.__class__.__name__, startB=answer[0]))
+                command=self.__class__.__name__, startB=startByte))
             return False
 
         # считаем сrc и сравниваем с тем, что получили
@@ -139,7 +146,8 @@ class DeviceCommand():
         countCrcValue = self._countPackageCRC(answer[:-2])
 
         if (receiveCrc != countCrcValue):
-            commandLogger.info("{command}: [Error] CRC answer! Expect: {expectCRC} Receive: {recCRC}".format(command=self.__class__.__name__, expectCRC=countCrcValue,recCRC=receiveCrc))
+            commandLogger.info("{command}: [Error] CRC answer! Expect: {expectCRC} Receive: {recCRC}".format(
+                command=self.__class__.__name__, expectCRC=countCrcValue, recCRC=receiveCrc))
             return False
 
         # Если слейв понял команду установки значений, то он возвращает
@@ -304,14 +312,23 @@ class DeviceCommand():
         #                  "{0}(0b{0:08b})".format(crc), bin(crcL))
         return crcL
 
-    def _getDataFromBytes(self, hightByte, lowByte):
+    def _getDataFromBytes(self, hightByteIN, lowByteIN):
         """ Функция получения байта данных из двух пакетных байтов"""
-        hightData = (ord(hightByte) & 0x0f) << 4
+        if isinstance(hightByteIN, int):
+            hightByte = hightByteIN
+        else:
+            hightByte = ord(hightByteIN)
 
-        if lowByte is None:
+        hightData = (hightByte & 0x0f) << 4
+
+        if lowByteIN is None:
             lowData = 0x00
         else:
-            lowData = (ord(lowByte) & 0x0f)
+            if isinstance(lowByteIN, int):
+                lowByte = lowByteIN
+            else:
+                lowByte = ord(lowByteIN)
+            lowData = (lowByte & 0x0f)
 
         return hightData | lowData
 

@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from devicecommand import DeviceCommand
-from commandcode import Command
+from .devicecommand import DeviceCommand
+from .commandcode import Command
 
 
 class GetADC(DeviceCommand):

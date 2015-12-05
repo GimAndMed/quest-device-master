@@ -2,10 +2,16 @@
 # -*- coding: utf-8 -*-
 
 from copy import copy
-from resource import Resource
+from .resource import Resource
 
 # итераторы для двух объектов сразу
-from itertools import izip, count
+from itertools import count
+try:
+    # Python 2.7
+    from itertools import izip
+except ImportError:
+    # python3
+    izip = zip
 
 
 class SmartLeds(Resource):
@@ -56,7 +62,7 @@ class SmartLeds(Resource):
         """Сохраняем значение обновлённого массива
             функция используется после отправки
             команды устройству."""
-        with self.block:
+        with self.lock:
             self.oldRgbLeds = copy(self.rgbLeds)
 
     def getChangeIdexes(self):
@@ -79,7 +85,7 @@ class SmartLeds(Resource):
             # убираем повторяющиеся индексы
             rgbIdList = list(set(changedRgbIndexlist))
 
-            return rgbIdList
+        return rgbIdList
 
     def octetChanged(self, rgbIndexList):
         """Функция возвращает номер октета в
@@ -91,10 +97,10 @@ class SmartLeds(Resource):
         octetIdList = list(set(octetIdListByRgb))
         # считаем кол-во изменившихся октетов
         numChanged = len(octetIdList)
-
+        print("numChanged: {} | octedList: {}".format(numChanged, octetIdList))
         if numChanged == 1:
             return octetIdList[0]
-        return False
+        return None
 
     def quartetChanged(self, rgbIndexList):
         """Функция возвращает номер квартета, в котором изменились
@@ -106,10 +112,10 @@ class SmartLeds(Resource):
         quartetIdList = list(set(quartetIdListByRgb))
         # считаем кол-во изменившихся октетов
         numChanged = len(quartetIdList)
-
+        print("quarte numChanged:", numChanged, " quartedList:", quartetIdList)
         if numChanged == 1:
             return quartetIdList[0]
-        return False
+        return None
 
     def oneChanged(self, rgbIndexList):
         """Функция возврщает номер светодиода, который изменился,
@@ -120,7 +126,7 @@ class SmartLeds(Resource):
 
         if numChanged == 1:
             return rgbIndexList[0]
-        return False
+        return None
 
     def changed(self):
         return not self.equal(self.oldRgbLeds, self.rgbLeds)

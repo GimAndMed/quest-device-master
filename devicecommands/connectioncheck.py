@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from devicecommand import DeviceCommand
-from commandcode import Command
+from .devicecommand import DeviceCommand
+from .commandcode import Command
 
 
 class ConnectionCheck(DeviceCommand):
@@ -41,8 +41,8 @@ class ConnectionCheck(DeviceCommand):
         return True
 
     def printInfo(self):
-        print "Bytes size: ", self.numAnswerBytes(), \
-            " Code: ", self.commandCode
+        print("Bytes size: ", self.numAnswerBytes(),
+              " Code: ", self.commandCode)
 
 
 if __name__ == '__main__':

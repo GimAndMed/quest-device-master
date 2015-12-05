@@ -3,9 +3,9 @@
 
 from ..devicecommands.commandfactory import CommandFactory
 from ..devicecommands.commandcode import Command
-
 import serial
 from time import sleep
+
 
 def testAllGetFunction(port, address):
     commandFactory = CommandFactory()
@@ -72,7 +72,7 @@ def testAllSetFunction(port, address):
 
 
 def initSerial():
-    ser = serial.Serial('/dev/pts/9',
+    ser = serial.Serial('/dev/ttyUSB0',
                         timeout=1,
                         writeTimeout=0.1,
                         bytesize=serial.EIGHTBITS,
@@ -85,30 +85,30 @@ def testResource():
     from deviceresources.relays import Relays
 
     relays = Relays()
-    print "Changed: ", relays.changed()
+    print("Changed: ", relays.changed())
     relays.set([0, 1, 0, 1])
-    print "Changed: ", relays.changed()
+    print("Changed: ", relays.changed())
 
 if __name__ == "__main__":
 
     ser = initSerial()
     port = ser
     address = 1
-    commandFactory = CommandFactory()
+    # commandFactory = CommandFactory()
 
     # command = commandFactory.createCommand(Command.changeSpeed)
     # command.init(port, address, 4)
     # command.execute()
     # sleep(5)
-    lcd = "hay Michael"
-    command = commandFactory.createCommand(Command.setLCD)
-    command.init(port, address, lcd)
-    command.execute()
-    sleep(2)
+    # lcd = "hay Michael"
+    # command = commandFactory.createCommand(Command.setLCD)
+    # command.init(port, address, lcd)
+    # command.execute()
+    # sleep(2)
     # port = ser
     # address = 1
 
-    # testAllGetFunction(port, address)
+    testAllGetFunction(port, address)
 
     # testAllSetFunction(port, address)
 

@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from devicecommand import DeviceCommand
-from commandcode import Command
+from .devicecommand import DeviceCommand
+from .commandcode import Command
 
 
 class SetSmartLeds(DeviceCommand):
@@ -30,7 +30,7 @@ class SetSmartLeds(DeviceCommand):
              = 293 байта в пакете
              меняем порядок тетрад
              H M L -> L M H"""
-        data = self.slave.getSmartLeds()
+        # data = self.slave.getSmartLeds()
 
         reversed12BitData = []
         for brightness12Bit in data:

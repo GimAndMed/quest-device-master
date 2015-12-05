@@ -1,20 +1,20 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from devicecommand import DeviceCommand
-from commandcode import Command
+from .devicecommand import DeviceCommand
+from .commandcode import Command
 
-from getbuttons import GetButtons
+from .getbuttons import GetButtons
 
-from getadc import GetADC
+from .getadc import GetADC
 
-from getencoders import GetEncoders
+from .getencoders import GetEncoders
 # from getencoders import parseData as encodersParseData
 
-from getsensor import GetSensor
+from .getsensor import GetSensor
 # from getsensor import parseData as sensorParseData
 
-from getstuckbuttons import GetStuckButtons
+from .getstuckbuttons import GetStuckButtons
 # from getStuckButtons import parseData as stuckButonsParseData
 
 
@@ -114,7 +114,7 @@ class GetAllStates(DeviceCommand):
             buttons.set(data[0])
             # self.slave.saveButtons(data[0])
 
-            adc = self.slave.getADC()
+            adc = self.slave.getAdc()
             adc.set(data[1])
             # self.slave.saveADC(data[1])
 
@@ -122,7 +122,7 @@ class GetAllStates(DeviceCommand):
             encoders.set(data[2])
             # self.slave.saveEncoders(data[2])
 
-            sensors = self.getSensors()
+            sensors = self.slave.getSensors()
             sensors.set(data[3])
             # self.slave.saveSensor(data[3])
 

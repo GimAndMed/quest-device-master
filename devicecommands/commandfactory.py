@@ -1,30 +1,30 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from commandcode import Command
+from .commandcode import Command
 
 # Общие команды
-from connectioncheck import ConnectionCheck
-from changespeed import ChangeSpeed
+from .connectioncheck import ConnectionCheck
+from .changespeed import ChangeSpeed
 
 # Команды установки значений
-from setsimpleleds import SetSimpleLeds
+from .setsimpleleds import SetSimpleLeds
 
-from setsmartoneleds import SetSmartOneLeds
-from setsmartquartetleds import SetSmartQuartetLeds
-from setsmartoctetleds import SetSmartOctetLeds
-from setsmartleds import SetSmartLeds
+from .setsmartoneleds import SetSmartOneLeds
+from .setsmartquartetleds import SetSmartQuartetLeds
+from .setsmartoctetleds import SetSmartOctetLeds
+from .setsmartleds import SetSmartLeds
 
-from setlcd import SetLCD
-from setrelays import SetRelays
+from .setlcd import SetLCD
+from .setrelays import SetRelays
 
 # Команды получения значений
-from getbuttons import GetButtons
-from getstuckbuttons import GetStuckButtons
-from getadc import GetADC
-from getencoders import GetEncoders
-from getsensor import GetSensor
-from getallstates import GetAllStates
+from .getbuttons import GetButtons
+from .getstuckbuttons import GetStuckButtons
+from .getadc import GetADC
+from .getencoders import GetEncoders
+from .getsensor import GetSensor
+from .getallstates import GetAllStates
 
 
 class CommandFactory:
