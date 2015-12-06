@@ -24,7 +24,7 @@ class SimpleLeds(Resource):
         self.leds = self.DEFAULT_VALUE * self.NUM_LEDS
 
         # массив, что уже был отправлен устройству
-        self.oldLeds = self.DEFAULT_VALUE * self.NUM_LEDS
+        self.oldLeds = [1] * self.NUM_LEDS
 
     def setResource(self, ledsArray):
         arrayLen = len(ledsArray)

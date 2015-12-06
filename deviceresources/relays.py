@@ -25,7 +25,7 @@ class Relays(Resource):
         self.relays = self.DEFAULT_VALUE * self.NUM_RELAYS
 
         # массив, что уже был отправлен устройству
-        self.oldRelays = self.DEFAULT_VALUE * self.NUM_RELAYS
+        self.oldRelays = [1] * self.NUM_RELAYS
 
     def setResource(self, relays):
 

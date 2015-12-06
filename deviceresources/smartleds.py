@@ -36,7 +36,7 @@ class SmartLeds(Resource):
         self.rgbLeds = self.DEFAULT_VALUE * self.NUM_LEDS
 
         # массив, что уже был отправлен устройству
-        self.oldRgbLeds = self.DEFAULT_VALUE * self.NUM_LEDS
+        self.oldRgbLeds = [1, 1, 1] * self.NUM_LEDS
 
     def setResource(self, rgbArray):
         rgbArrayLen = len(rgbArray)
@@ -57,6 +57,14 @@ class SmartLeds(Resource):
     def getResource(self):
         retValue = copy(self.rgbLeds)
         return retValue
+
+    def setOneLed(self, id, color):
+        if (id < 0) or (id >= self.NUM_LEDS):
+            return
+        with self.lock:
+            self.rgbLeds[id * 3 + 0] = color[0]
+            self.rgbLeds[id * 3 + 1] = color[1]
+            self.rgbLeds[id * 3 + 2] = color[2]
 
     def save(self):
         """Сохраняем значение обновлённого массива

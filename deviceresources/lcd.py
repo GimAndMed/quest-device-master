@@ -24,7 +24,7 @@ class Lcd(Resource):
         self.lcd = self.DEFAULT_VALUE * self.NUM_ELEMENTS
 
         # массив, что уже был отправлен устройству
-        self.oldLcd = self.DEFAULT_VALUE * self.NUM_ELEMENTS
+        self.oldLcd =  '' * self.NUM_ELEMENTS
 
     def setResource(self, lcd):
 
