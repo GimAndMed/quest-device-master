@@ -166,8 +166,8 @@ class DeviceMaster:
         slave.sendCommand(Command.changeSpeed, boudrate)
         sleep(1)
 
-        # создаём поток для каждого уникального порта
-        self._createPortThread(comPortDescriptor, slave)
+        # # создаём поток для каждого уникального порта
+        # self._createPortThread(comPortDescriptor, slave)
 
         return slave
 
@@ -180,6 +180,12 @@ class DeviceMaster:
     VALUE_CLASS_OBJECT = "object"
     VALUE_CLASS_VALUE = "value"
     VALUE_CLASS_DEFAULT_VALUE = VALUE_CLASS_OBJECT
+
+
+    def start(self):
+        for slave in self.__slaveList:
+            # создаём поток для каждого уникального порта
+            self._createPortThread(slave.getPort(), slave)
 
     # АЦП
     def getAdc(self, slave, valueClass=VALUE_CLASS_DEFAULT_VALUE):

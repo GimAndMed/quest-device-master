@@ -16,7 +16,7 @@ class Lcd(Resource):
     """
 
     NUM_ELEMENTS = 80
-    DEFAULT_VALUE = [0]
+    DEFAULT_VALUE = [' ']
 
     def __init__(self):
         Resource.__init__(self)
@@ -24,7 +24,7 @@ class Lcd(Resource):
         self.lcd = self.DEFAULT_VALUE * self.NUM_ELEMENTS
 
         # массив, что уже был отправлен устройству
-        self.oldLcd =  '' * self.NUM_ELEMENTS
+        self.oldLcd =  '-' * self.NUM_ELEMENTS
 
     def setResource(self, lcd):
 

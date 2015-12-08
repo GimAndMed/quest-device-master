@@ -4,7 +4,7 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
 from .commandcode import Command, commandTypeIsGet, commandTypeIsSet
 import logging
-
+from serial import SerialTimeoutException
 # для отладочного вывода
 logging.basicConfig(
     format=u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s%(message)s',
@@ -77,7 +77,10 @@ class DeviceCommand():
         self._printPackage(package, "{} Send:".format(self.__class__.__name__))
 
         # отправляем его в порт
-        self.send(package)
+        # try:
+        self.send(str(package))
+        # except SerialTimeoutException:
+        #     return False
 
         # получаем ответ
         answer = self.receive()
