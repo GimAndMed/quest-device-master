@@ -45,3 +45,10 @@ class Encoders(Resource):
 
     def changed(self):
         return not self.equal(self.oldEncoders, self.encoders)
+
+
+    def printResource(self):
+        print("Encoders value: \n")
+        for index, value in enumerate(self.encoders):
+            print("[{index}]: {value} ".format(index=index, value=value)),
+        print

@@ -10,6 +10,10 @@ from time import sleep
 
 import os
 
+def clear():
+    os.system('cls' if os.name=='nt' else 'clear')
+
+
 RED = [0xfff, 0x0, 0x0]
 GREEN = [0x0, 0xfff, 0x0]
 BLUE = [0x0, 0x0, 0xfff]
@@ -74,18 +78,50 @@ if __name__ == "__main__":
     #portDestination = "/dev/ttyUSB0"
     port_CB_SLAVE_1 = "COM5"
     port_CB_SLAVE_2 = "COM4"
-    CB_SLAVE_2 = master.addSlave("CB_SLAVE_2", port_CB_SLAVE_2, 1, boudrate=5)
-    CB_SLAVE_1 = master.addSlave("CB_SLAVE_1", port_CB_SLAVE_1, 2, boudrate=5)
+    port_hall= "COM3"
+    #CB_SLAVE_2 = master.addSlave("CB_SLAVE_2", port_CB_SLAVE_2, 1, boudrate=5)
+    #CB_SLAVE_1 = master.addSlave("CB_SLAVE_1", port_CB_SLAVE_1, 2, boudrate=5)
+    HALL_SLAVE = master.addSlave("HALL_SLAVE", port_hall, 1, boudrate=5)
     master.start()
+    clear()    
     while True:
-    	print("CB_SLAVE_1: ")
-        master.getButtons(CB_SLAVE_1).printResource()
-        master.getAdc(CB_SLAVE_1).printResource()
+    	clear()
+    	print("Hall relays: \n\n")
+	relays = master.getRelays(HALL_SLAVE)
+	relays.printResource()
+
+	relaysList = relays.get()
+	print("Enter relay number for turn:")
+	for index, relay in enumerate(relaysList):
+		if relay:
+			print("[{id}]: {value} | Turn OFF".format(id=index, value=relay))
+		else:
+			print("[{id}]: {value} | Turn ON".format(id=index, value=relay))
+	choose = -1
+	
+	choose = raw_input("Your choose: ")
+	if not choose.isdigit():
+		continue
+	
+	index = int(choose)
+	if  not ( 0 <= index <= 3 ):
+		continue
+
+	if relaysList[index]:
+		relaysList[index] = 0
+	else:
+		relaysList[index] = 1
+
+	relays.set(relaysList)
+	
+	
+        #master.getButtons(CB_SLAVE_1).printResource()
+        #master.getAdc(CB_SLAVE_1).printResource()
         # printAllStates(master, slave)
         # raw_input("Press Enter to continue...")
-	print("\n\nCB_SLAVE_2: ")
-        master.getButtons(CB_SLAVE_2).printResource()
-        master.getAdc(CB_SLAVE_2).printResource()
-	master.getRelays(CB_SLAVE_2).printResource()
-        sleep(0.1)
-        os.system('clear')
+	#print("\n\nCB_SLAVE_2: 3 and 4 Monitor")
+        #master.getButtons(CB_SLAVE_2).printResource()
+        #master.getAdc(CB_SLAVE_2).printResource()
+	#master.getRelays(CB_SLAVE_2).printResource()
+        #sleep(0.1)
+	#clear()
