@@ -78,7 +78,7 @@ class DeviceCommand():
 
         # отправляем его в порт
         # try:
-        self.send(str(package))
+        self.send(package)
         # except SerialTimeoutException:
         #     return False
 
