@@ -11,6 +11,7 @@ logging.basicConfig(
     level=logging.DEBUG)
 commandLogger = logging.getLogger('package')
 logging.disable(logging.DEBUG)
+import time
 # logging.disable(logging.NOTSET)
 
 
@@ -91,6 +92,12 @@ class DeviceCommand():
         # определяем что ответ валидный
         # слейв понял нашу команду и выполнил
         if (not self.answerValid(answer)):
+            
+            self.portDescriptor.flush()
+            self.portDescriptor.close()
+            time.sleep(1)
+            self.portDescriptor.open()
+            time.sleep(1)
             return False
 
         # берём из ответного пакета данные
