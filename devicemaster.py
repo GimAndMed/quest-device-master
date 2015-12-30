@@ -164,7 +164,7 @@ class DeviceMaster:
 
         # меняем скорость
         slave.sendCommand(Command.changeSpeed, boudrate)
-        sleep(1)
+        # sleep(1)
 
         # # создаём поток для каждого уникального порта
         # self._createPortThread(comPortDescriptor, slave)

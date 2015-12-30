@@ -63,7 +63,7 @@ class ChangeSpeed(DeviceCommand):
             return
 
         self.portDescriptor.flush()
-        sleep(1)
+        # sleep(1)
 
         self.portDescriptor.baudrate = self.baudrateList[speedID]
         self.portDescriptor.close()
@@ -71,7 +71,7 @@ class ChangeSpeed(DeviceCommand):
         self.portDescriptor.open()
         print("Speed changed from {0} to {1}: ".format(
             oldBaudrate, self.baudrateList[speedID]))
-        sleep(1)
+        # sleep(1)
 
     def parseData(self, data):
         """ В ответе данных нет: pass"""
