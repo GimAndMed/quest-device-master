@@ -97,7 +97,6 @@ class DeviceCommand():
             self.portDescriptor.close()
             time.sleep(1)
             self.portDescriptor.open()
-            time.sleep(1)
             return False
 
         # берём из ответного пакета данные

@@ -78,14 +78,14 @@ if __name__ == "__main__":
     #portDestination = "/dev/ttyUSB0"
     port_CB_SLAVE_1 = "COM5"
     port_CB_SLAVE_2 = "COM4"
-    port_hall= "COM4"
+    port_hall= "COM3"
     #CB_SLAVE_2 = master.addSlave("CB_SLAVE_2", port_CB_SLAVE_2, 1, boudrate=5)
     #CB_SLAVE_1 = master.addSlave("CB_SLAVE_1", port_CB_SLAVE_1, 2, boudrate=5)
     HALL_SLAVE = master.addSlave("HALL_SLAVE", port_hall, 1, boudrate=5)
     master.start()
     clear()    
     while True:
-    	clear()
+   	# clear()
     	print("Hall relays: \n\n")
 	relays = master.getRelays(HALL_SLAVE)
 	relays.printResource()
