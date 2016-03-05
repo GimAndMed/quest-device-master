@@ -43,11 +43,19 @@ class Device:
 
     # Функции получения ресурсов устройства
     # Возвращаются объекты.
+    # АЦП
     def getAdc(self):
         return self.adc
 
+    def setAdc(self, value):
+        self.adc.set(value)
+
+    # Энкодеры
     def getEncoders(self):
         return self.encoders
+
+    def setEncoders(self, value):
+        self.encoders.set(value)
 
     # ЖКИ
     def getLcd(self):
@@ -70,9 +78,18 @@ class Device:
     def getStuckButtons(self):
         return self.stuckButtons
 
+    def setButtons(self, value):
+        self.buttons.set(value)
+
+    def setStuckButtons(self, value):
+        self.stuckbuttons.set(value)
+
     # Сенсорные кнопки
     def getSensors(self):
         return self.sensors
+
+    def setSensors(self, value):
+        self.sensors.set(value)
 
     # Умные светодиоды
     def getSmartLeds(self):

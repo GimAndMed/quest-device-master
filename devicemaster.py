@@ -87,7 +87,6 @@ class DeviceMaster(Pyro.core.ObjBase):
         print( 'Server object  ready.')
         daemon.requestLoop()
 
-
     def _createPortThread(self, port, slave):
         """Создаение потока работы с устройствами
         Для каждого ком-порта создаётся свой поток
@@ -249,6 +248,12 @@ class DeviceMaster(Pyro.core.ObjBase):
             return slaveDescriptor.getAdc()
         return slaveDescriptor.getAdc().get()
 
+    def setAdc(self, slave, value):
+        slaveDescriptor = self._getSlaveDescriptor(slave)
+        if not slaveDescriptor:
+            return
+        slaveDescriptor.setAdc(value)
+
     # Кнопки
     def getButtons(self, slave, valueClass=VALUE_CLASS_DEFAULT_VALUE):
         slaveDescriptor = self._getSlaveDescriptor(slave)
@@ -257,6 +262,12 @@ class DeviceMaster(Pyro.core.ObjBase):
         if valueClass == self.VALUE_CLASS_OBJECT:
             return slaveDescriptor.getButtons()
         return slaveDescriptor.getButtons().get()
+
+    def setButtons(self, slave, value):
+        slaveDescriptor = self._getSlaveDescriptor(slave)
+        if not slaveDescriptor:
+            return
+        slaveDescriptor.setButtons(value)
 
     # 'Залипшие' кнопки
     def getStuckButtons(self, slave, valueClass=VALUE_CLASS_DEFAULT_VALUE):
@@ -267,6 +278,12 @@ class DeviceMaster(Pyro.core.ObjBase):
             return slaveDescriptor.getStuckButtons()
         return slaveDescriptor.getStuckButtons().get()
 
+    def setStuckButtons(self, slave, value):
+        slaveDescriptor = self._getSlaveDescriptor(slave)
+        if not slaveDescriptor:
+            return
+        slaveDescriptor.setStuckButtons(value)
+
     # Энкодеры
     def getEncoders(self, slave, valueClass=VALUE_CLASS_DEFAULT_VALUE):
         slaveDescriptor = self._getSlaveDescriptor(slave)
@@ -275,6 +292,12 @@ class DeviceMaster(Pyro.core.ObjBase):
         if valueClass == self.VALUE_CLASS_OBJECT:
             return slaveDescriptor.getEncoders()
         return slaveDescriptor.getEncoders().get()
+
+    def setEncoders(self, slave, value):
+        slaveDescriptor = self._getSlaveDescriptor(slave)
+        if not slaveDescriptor:
+            return
+        slaveDescriptor.setEncoders(value)
 
     # ЖКИ
     def getLcd(self, slave, valueClass=VALUE_CLASS_DEFAULT_VALUE):
@@ -346,6 +369,11 @@ class DeviceMaster(Pyro.core.ObjBase):
         else:
             return slaveDescriptor.getSensors().get()
 
+    def setSensors(self, slave, value):
+        slaveDescriptor = self._getSlaveDescriptor(slave)
+        if not slaveDescriptor:
+            return
+        slaveDescriptor.setSensors(value)
 
 class ThreadContext:
     """Контекст потоков, выполняющих опрос устройств.

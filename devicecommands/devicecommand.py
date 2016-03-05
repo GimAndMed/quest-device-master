@@ -83,11 +83,14 @@ class DeviceCommand():
         # печатаем
         self._printPackage(package, "{} Send:".format(self.__class__.__name__))
 
+        # В режиме отладки пропускаем отправку и разбор ответа.
+        # Симуляция ответа реализована через через прямую запись в
+        # массивы устройств модулём Pyro
+        if self.__debugMode:
+            return True
+
         # отправляем его в порт
-        # try:
         self.send(package)
-        # except SerialTimeoutException:
-        #     return False
 
         # получаем ответ
         answer = self.receive()
