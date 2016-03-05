@@ -30,7 +30,11 @@ from .getallstates import GetAllStates
 class CommandFactory:
 
     def __init__(self):
-        pass
+        self.__debugMode = False
+
+    def setDebugMode(self):
+        self.__debugMode = True
+
 
     def createCommand(self, commandCode,
                       port=None, address=None, data=None, slave=None):

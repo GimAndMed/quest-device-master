@@ -17,13 +17,18 @@ class Device:
     """Устройство. Предоставляет доступ к данным подключённой платы.
     """
 
-    def __init__(self, address, portDescriptor, name=None):
+    def __init__(self, address, portDescriptor, name, debugMode):
         self.__address = address
         self.__portDescriptor = portDescriptor
         self.__name = name
 
+        self.__debugMode = debugMode
+
         # Создаём фабрику команд
         self.commandFactory = CommandFactory()
+
+        if self.__debugMode:
+            self.commandFactory.setDebugMode()
 
         # создаём реcурсы
         self.adc = adc.Adc()

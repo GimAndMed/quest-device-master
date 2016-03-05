@@ -8,6 +8,8 @@ from time import sleep
 from .device import Device
 from .devicecommands.commandcode import Command
 
+import Pyro
+
 
 # Для обработки очереди команд
 try:
@@ -16,8 +18,15 @@ except:
     import queue as Queue
 import threading
 
+# Используется при отладке.
+# Данное имя используется клиентом при подключении
+# Реализовано при помощи модуля Pyro
+DEBUG_SERVER_NAME = "DEVICE_MASTER"
+# Чтобы включить режим отладки переменная окружения
+# DEBUG_GLOBAL_VARIABLE  должа быть не нулевой
+DEBUG_GLOBAL_VARIABLE = "DEVICE_DEBUG"
 
-class DeviceMaster:
+class DeviceMaster(Pyro.core.ObjBase):
 
     COM_READ_TIMEOUT = 1
     # Таймаут по записи в com-порт
@@ -37,6 +46,47 @@ class DeviceMaster:
 
         # список созданных потоков
         self.threadList = []
+
+        self.debugMode = False
+
+        if os.environ.get(DEBUG_GLOBAL_VARIABLE):
+            self.debugMode = True
+
+    def _createDebugThread(self):
+
+        debugThread = threading.Thread(
+            target=self._debugThread)
+
+        # сохраняем дескриптор в списке
+        self.threadList.append(debugThread)
+
+        # запускаем
+        portThread.daemon = True
+        portThread.start()
+
+    def _debugThread(self):
+        Pyro.core.initServer()
+        daemon = Pyro.core.Daemon()
+        # locate the NS
+        locator = Pyro.naming.NameServerLocator()
+        print( 'searching for Name Server...')
+        ns = locator.getNS()
+        daemon.useNameServer(ns)
+
+        # connect a new object implementation (first unregister previous one)
+        try:
+                # 'test' is the name by which our object will be known to the outside world
+                ns.unregister(DEBUG_SERVER_NAME)
+        except NamingError:
+                pass
+
+        # connect new object implementation
+        daemon.connect(self, DEBUG_SERVER_NAME)
+
+        # enter the server loop.
+        print( 'Server object  ready.')
+        daemon.requestLoop()
+
 
     def _createPortThread(self, port, slave):
         """Создаение потока работы с устройствами
@@ -81,13 +131,16 @@ class DeviceMaster:
 
         # ComPort not exist in List ->
         #    then Open port, add in List and return
-        serialDescriptor = serial.Serial(
-            devComPortName, self.DEFAULT_BAUDRATE,
-            timeout=self.COM_READ_TIMEOUT,
-            writeTimeout=self.COM_WRITE_TIMEOUT,
-            bytesize=serial.EIGHTBITS,
-            parity=serial.PARITY_NONE,
-            stopbits=serial.STOPBITS_ONE)
+        if self.debugMode:
+            serialDescriptor = None
+        else:
+            serialDescriptor = serial.Serial(
+                devComPortName, self.DEFAULT_BAUDRATE,
+                timeout=self.COM_READ_TIMEOUT,
+                writeTimeout=self.COM_WRITE_TIMEOUT,
+                bytesize=serial.EIGHTBITS,
+                parity=serial.PARITY_NONE,
+                stopbits=serial.STOPBITS_ONE)
 
         self.__comPortList.append(serialDescriptor)
         return serialDescriptor

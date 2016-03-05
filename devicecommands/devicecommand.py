@@ -36,6 +36,12 @@ class DeviceCommand():
         self.slave = slave
         self.connection = False
 
+        self.__debugMode = False
+
+    def setDebugMode(self):
+        self.__debugMode = True
+
+
     @abstractproperty
     def numAnswerDataBytes(self):
         """ Кол-во байтов данных в пакете (не старших и младших) """
@@ -92,7 +98,7 @@ class DeviceCommand():
         # определяем что ответ валидный
         # слейв понял нашу команду и выполнил
         if (not self.answerValid(answer)):
-            
+
             self.portDescriptor.flush()
             self.portDescriptor.close()
             time.sleep(1)
