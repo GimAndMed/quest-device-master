@@ -74,4 +74,7 @@ class CommandFactory:
         elif (Command.getAllStates == commandCode):
             command = GetAllStates(port, address, data, slave)
 
+        if self.__debugMode:
+            command.setDebugMode()
+
         return command

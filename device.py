@@ -17,7 +17,7 @@ class Device:
     """Устройство. Предоставляет доступ к данным подключённой платы.
     """
 
-    def __init__(self, address, portDescriptor, name, debugMode):
+    def __init__(self, address, portDescriptor, name, debugMode=False):
         self.__address = address
         self.__portDescriptor = portDescriptor
         self.__name = name

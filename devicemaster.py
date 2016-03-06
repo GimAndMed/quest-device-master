@@ -8,7 +8,10 @@ from time import sleep
 from .device import Device
 from .devicecommands.commandcode import Command
 
-import Pyro
+import Pyro.core
+import Pyro.naming
+from Pyro.errors import PyroError,NamingError
+import os
 
 
 # Для обработки очереди команд
@@ -51,6 +54,7 @@ class DeviceMaster(Pyro.core.ObjBase):
 
         if os.environ.get(DEBUG_GLOBAL_VARIABLE):
             self.debugMode = True
+            Pyro.core.ObjBase.__init__(self)
 
     def _createDebugThread(self):
 
@@ -61,8 +65,11 @@ class DeviceMaster(Pyro.core.ObjBase):
         self.threadList.append(debugThread)
 
         # запускаем
-        portThread.daemon = True
-        portThread.start()
+        debugThread.daemon = True
+        debugThread.start()
+
+    def hello(self):
+        return "Hello, from deviceMaster"
 
     def _debugThread(self):
         Pyro.core.initServer()
@@ -166,6 +173,14 @@ class DeviceMaster(Pyro.core.ObjBase):
         """
         while True:
 
+            # Без обращения к устройствам исчезают задержки
+            # связанные с обращением к com-порту
+            # чтобы не забивать процессор циклом с быстрыми
+            # командами мы просто вставляем задержку.
+            # чтобы исключить загрузку процессора
+            if self.debugMode:
+                sleep(0.2)
+
             # достаём из контекста данные
             slaveList = context.getSlaves()
             port = context.getPort()
@@ -207,10 +222,13 @@ class DeviceMaster(Pyro.core.ObjBase):
         Параметры для добавления устройства:
         """
         # Инициализируем com-порт
-        comPortDescriptor = self._initComPort(comPort)
+        if self.debugMode:
+            comPortDescriptor = None
+        else:
+            comPortDescriptor = self._initComPort(comPort)
 
         # создаём ведомое устройство
-        slave = Device(address, comPortDescriptor, name)
+        slave = Device(address, comPortDescriptor, name, self.debugMode)
 
         self.__slaveList.append(slave)
 
@@ -235,6 +253,9 @@ class DeviceMaster(Pyro.core.ObjBase):
 
 
     def start(self):
+        if self.debugMode:
+            self._createDebugThread()
+
         for slave in self.__slaveList:
             # создаём поток для каждого уникального порта
             self._createPortThread(slave.getPort(), slave)
@@ -261,6 +282,13 @@ class DeviceMaster(Pyro.core.ObjBase):
             return
         if valueClass == self.VALUE_CLASS_OBJECT:
             return slaveDescriptor.getButtons()
+        return slaveDescriptor.getButtons().get()
+
+
+    def g_getButtons(self, slave, valueClass=VALUE_CLASS_DEFAULT_VALUE):
+        slaveDescriptor = self._getSlaveDescriptor(slave)
+        if not slaveDescriptor:
+            return
         return slaveDescriptor.getButtons().get()
 
     def setButtons(self, slave, value):
