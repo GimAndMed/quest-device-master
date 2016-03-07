@@ -28,6 +28,7 @@ DEBUG_SERVER_NAME = "DEVICE_MASTER"
 # Чтобы включить режим отладки переменная окружения
 # DEBUG_GLOBAL_VARIABLE  должа быть не нулевой
 DEBUG_GLOBAL_VARIABLE = "DEVICE_DEBUG"
+DEBUG_GLOBAL_VARIABLE_VALUE = "1"
 
 class DeviceMaster(Pyro.core.ObjBase):
 
@@ -50,10 +51,10 @@ class DeviceMaster(Pyro.core.ObjBase):
         # список созданных потоков
         self.threadList = []
 
-        self.debugMode = False
+        self.__debugMode = False
 
-        if os.environ.get(DEBUG_GLOBAL_VARIABLE):
-            self.debugMode = True
+        if os.environ.get(DEBUG_GLOBAL_VARIABLE) == DEBUG_GLOBAL_VARIABLE_VALUE:
+            self.__debugMode = True
             Pyro.core.ObjBase.__init__(self)
 
     def _createDebugThread(self):
@@ -137,16 +138,13 @@ class DeviceMaster(Pyro.core.ObjBase):
 
         # ComPort not exist in List ->
         #    then Open port, add in List and return
-        if self.debugMode:
-            serialDescriptor = None
-        else:
-            serialDescriptor = serial.Serial(
-                devComPortName, self.DEFAULT_BAUDRATE,
-                timeout=self.COM_READ_TIMEOUT,
-                writeTimeout=self.COM_WRITE_TIMEOUT,
-                bytesize=serial.EIGHTBITS,
-                parity=serial.PARITY_NONE,
-                stopbits=serial.STOPBITS_ONE)
+        serialDescriptor = serial.Serial(
+            devComPortName, self.DEFAULT_BAUDRATE,
+            timeout=self.COM_READ_TIMEOUT,
+            writeTimeout=self.COM_WRITE_TIMEOUT,
+            bytesize=serial.EIGHTBITS,
+            parity=serial.PARITY_NONE,
+            stopbits=serial.STOPBITS_ONE)
 
         self.__comPortList.append(serialDescriptor)
         return serialDescriptor
@@ -177,8 +175,8 @@ class DeviceMaster(Pyro.core.ObjBase):
             # связанные с обращением к com-порту
             # чтобы не забивать процессор циклом с быстрыми
             # командами мы просто вставляем задержку.
-            # чтобы исключить загрузку процессора
-            if self.debugMode:
+            # чтобы исключить загрузку процессора под 100%
+            if self.__debugMode:
                 sleep(0.2)
 
             # достаём из контекста данные
@@ -222,13 +220,13 @@ class DeviceMaster(Pyro.core.ObjBase):
         Параметры для добавления устройства:
         """
         # Инициализируем com-порт
-        if self.debugMode:
+        if self.__debugMode:
             comPortDescriptor = None
         else:
             comPortDescriptor = self._initComPort(comPort)
 
         # создаём ведомое устройство
-        slave = Device(address, comPortDescriptor, name, self.debugMode)
+        slave = Device(address, comPortDescriptor, name, self.__debugMode)
 
         self.__slaveList.append(slave)
 
@@ -253,7 +251,7 @@ class DeviceMaster(Pyro.core.ObjBase):
 
 
     def start(self):
-        if self.debugMode:
+        if self.__debugMode:
             self._createDebugThread()
 
         for slave in self.__slaveList:

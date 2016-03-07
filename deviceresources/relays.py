@@ -52,6 +52,6 @@ class Relays(Resource):
         return not self.equal(self.oldRelays, self.relays)
 
     def printResource(self):
-    	print("Relays: ")
-	for index, relay in enumerate(self.relays):
-		print("\t[{id}]: {value}".format(id=index, value=relay))
+        print("Relays: ")
+        for index, relay in enumerate(self.relays):
+                print("\t[{id}]: {value}".format(id=index, value=relay))
