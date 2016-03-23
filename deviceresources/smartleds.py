@@ -105,7 +105,7 @@ class SmartLeds(Resource):
         octetIdList = list(set(octetIdListByRgb))
         # считаем кол-во изменившихся октетов
         numChanged = len(octetIdList)
-        print("numChanged: {} | octedList: {}".format(numChanged, octetIdList))
+        # print("numChanged: {} | octedList: {}".format(numChanged, octetIdList))
         if numChanged == 1:
             return octetIdList[0]
         return None
@@ -120,7 +120,7 @@ class SmartLeds(Resource):
         quartetIdList = list(set(quartetIdListByRgb))
         # считаем кол-во изменившихся октетов
         numChanged = len(quartetIdList)
-        print("quarte numChanged:", numChanged, " quartedList:", quartetIdList)
+        # print("quarte numChanged:", numChanged, " quartedList:", quartetIdList)
         if numChanged == 1:
             return quartetIdList[0]
         return None

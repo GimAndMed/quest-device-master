@@ -165,7 +165,7 @@ class Device:
             oneRgbIndex = self.smartLeds.oneChanged(changedRgbIndexList)
 
             if oneRgbIndex is not None:
-                print("OneLedChanged")
+                # print("OneLedChanged")
                 oneRgbData = [oneRgbIndex]
                 oneRgbData.extend(self.smartLeds.getRgbLed(
                     oneRgbIndex))
@@ -173,7 +173,7 @@ class Device:
                     Command.setSmartOneLeds, oneRgbData)
 
             elif quartetIndex is not None:
-                print("Quartetchanged")
+                # print("Quartetchanged")
                 quartetData = [quartetIndex]
                 quartetData.extend(self.smartLeds.getQuartet(
                     quartetIndex))
@@ -181,7 +181,7 @@ class Device:
                     Command.setSmartQuartetLeds, quartetData)
 
             elif octetIndex is not None:
-                print("OctetChanged, index:", octetIndex)
+                # print("OctetChanged, index:", octetIndex)
                 octetData = [octetIndex]
                 octetData.extend(self.smartLeds.getOctet(
                     octetIndex))
@@ -189,12 +189,12 @@ class Device:
                     Command.setSmartOctetLeds, octetData)
 
             else:
-                print("AllChanged")
+                # print("AllChanged")
                 sendStatus = self.sendCommand(Command.setSmartLeds,
                                               self.smartLeds.get())
             # сохраняем отправленные на устройство значения
             if sendStatus:
-                print("SendSatatus OK")
+                # print("SendSatatus OK")
                 self.smartLeds.save()
 
     def sendRelays(self):
