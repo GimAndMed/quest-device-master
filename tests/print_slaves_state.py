@@ -92,12 +92,18 @@ if __name__ == "__main__":
     # portDestination = os.path.expanduser('~') + '/ptyp2'
     #portDestination = "/dev/ttyUSB0"
     #portDestination = "/dev/ttyUSB0"
+    port_HALLWAY_PUZZLES = "COM3"
     port_CB_SLAVE_1 = "COM5"
     port_CB_SLAVE_2 = "COM4"
-    hallwayPuzzles = master.addSlave("hallwayPuzzles", "COM3", 1, boudrate=5)
-    CB_SLAVE_2 = master.addSlave("CB_SLAVE_2", port_CB_SLAVE_2, 1, boudrate=5)
-    CB_SLAVE_1 = master.addSlave("CB_SLAVE_1", port_CB_SLAVE_1, 2, boudrate=5)
+    if slave_id == 1 or slave_id == 0:
+        hallwayPuzzles = master.addSlave("hallwayPuzzles", port_HALLWAY_PUZZLES, 1, boudrate=5)
+    if slave_id == 2 or slave_id == 0:
+        CB_SLAVE_1 = master.addSlave("CB_SLAVE_1", port_CB_SLAVE_1, 3, boudrate=5)
+    if slave_id == 3 or slave_id == 0:
+        CB_SLAVE_2 = master.addSlave("CB_SLAVE_2", port_CB_SLAVE_2, 2, boudrate=5)
+
     master.start()
+
     while True:
 
         if slave_id == 1 or slave_id == 0:
