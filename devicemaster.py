@@ -59,6 +59,9 @@ class DeviceMaster(Pyro.core.ObjBase):
             self.__debugMode = True
             Pyro.core.ObjBase.__init__(self)
 
+    def debugMode(self):
+        return self.__debugMode
+
     def _createDebugThread(self):
 
         debugThread = threading.Thread(
