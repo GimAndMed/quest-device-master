@@ -98,6 +98,7 @@ class DeviceCommand():
         self._printPackage(
             answer, "{} Receive:".format(self.__class__.__name__))
 
+	self.executeSpecialCommand()
         # определяем что ответ валидный
         # слейв понял нашу команду и выполнил
         if (not self.answerValid(answer)):
@@ -131,6 +132,9 @@ class DeviceCommand():
 
     def receive(self):
         return self.portDescriptor.read(self.numAnswerBytes())
+
+    def executeSpecialCommand(self):
+        pass
 
     def answerValid(self, answer):
         """ Определение валидности ответного пакета """

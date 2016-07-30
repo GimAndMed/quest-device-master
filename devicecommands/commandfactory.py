@@ -42,7 +42,7 @@ class CommandFactory:
         if (Command.connectionCheck == commandCode):
             command = ConnectionCheck(port, address, data, slave)
         elif (Command.changeSpeed == commandCode):
-            command = ChangeSpeed(port, address, data, slave)
+            command = ChangeSpeed(port, 15, data, slave)
 
         # Команды установки значений
         elif (Command.setSimpleLeds == commandCode):
