@@ -45,7 +45,6 @@ class ChangeSpeed(DeviceCommand):
     def send(self, package):
         numBytesSend = self.portDescriptor.write(package)
 
-        self._setNewSpeed()
 
         return numBytesSend
 
@@ -66,16 +65,17 @@ class ChangeSpeed(DeviceCommand):
         # sleep(1)
 
         self.portDescriptor.baudrate = self.baudrateList[speedID]
-        self.portDescriptor.close()
-        sleep(1)
-        self.portDescriptor.open()
         print("Speed changed from {0} to {1}: ".format(
             oldBaudrate, self.baudrateList[speedID]))
-        # sleep(1)
+        sleep(1)
 
     def parseData(self, data):
         """ В ответе данных нет: pass"""
         pass
+
+    def executeSpecialCommand(self):
+        self._setNewSpeed()
+
 
     def saveDataInSlave(self, data):
         """ В ответе данных нет: pass"""
