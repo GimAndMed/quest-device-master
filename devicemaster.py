@@ -26,9 +26,13 @@ import threading
 # Реализовано при помощи модуля Pyro
 DEBUG_SERVER_NAME = "DEVICE_MASTER"
 # Чтобы включить режим отладки переменная окружения
-# DEBUG_GLOBAL_VARIABLE  должа быть не нулевой
+# DEBUG_GLOBAL_VARIABLE  должна быть не нулевой
 DEBUG_GLOBAL_VARIABLE = "DEBUG_MASTER"
-DEBUG_GLOBAL_VARIABLE_VALUE = "1"
+DEBUG_GLOBAL_VARIABLE_VALUES = ('t', 'true', 'yes', '1')
+
+DEBUG = os.environ.get(DEBUG_GLOBAL_VARIABLE, 'false').lower() in \
+        DEBUG_GLOBAL_VARIABLE_VALUES
+
 PYRO_NS="pyro-ns &"
 
 class DeviceMaster(Pyro.core.ObjBase):
@@ -54,7 +58,7 @@ class DeviceMaster(Pyro.core.ObjBase):
 
         self.__debugMode = False
 
-        if os.environ.get(DEBUG_GLOBAL_VARIABLE) == DEBUG_GLOBAL_VARIABLE_VALUE:
+        if DEBUG:
             os.system(PYRO_NS)
             self.__debugMode = True
             Pyro.core.ObjBase.__init__(self)
